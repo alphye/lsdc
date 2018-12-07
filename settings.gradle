@@ -1,0 +1,6 @@
+rootProject.name = 'lsdc'
+include 'lsdc-api'
+include 'lsdc-common'
+include 'lsdc-kernel'
+include 'lsdc-agv'
+
