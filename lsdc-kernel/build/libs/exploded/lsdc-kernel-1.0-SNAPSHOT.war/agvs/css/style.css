@@ -195,7 +195,7 @@ text-shadow:0 0 1px currentColor,-1px -1px 1px #030,0 -1px 1px #030,1px -1px 1px
 .distant-front{font-weight:bold;color:#840;text-shadow:0 0 1px currentColor,-1px -1px 1px #000,0 -1px 1px #000,1px -1px 1px #000,1px 0 1px #000,1px 1px 1px #000,0 1px 1px #000,-1px 1px 1px #000,-1px 0 1px #000}
 /* .distant-front:after{content:'Distant Front';text-shadow:0 0 1px currentColor;-webkit-filter:url(#distant-front);filter:url(#distant-front)}
  */
-.diff1{display:inline-block;font-weight:bold;color:#def;text-shadow:0 0 1px currentColor,-1px -1px 1px #000,0 -1px 1px #000,1px -1px 1px #000,1px 0 1px #000,1px 1px 1px #000,0 1px 1px #000,-1px 1px 1px #000,-1px 0 1px #000;-webkit-filter:url(#diff1);filter:url(#diff1);/*background:#def;padding:0 .2em*/}
+.diff1{display:inline-block;font-weight:bold;color:#769ec5;text-shadow:0 0 1px currentColor,-1px -1px 1px #000,0 -1px 1px #000,1px -1px 1px #000,1px 0 1px #000,1px 1px 1px #000,0 1px 1px #000,-1px 1px 1px #000,-1px 0 1px #000;-webkit-filter:url(#diff1);filter:url(#diff1);/*background:#def;padding:0 .2em*/}
 
 .bevel{font-family:cursive;color:rgba(40,80,120,.9);
 text-shadow:-1px -1px 1px #000,0 -1px 1px #000,

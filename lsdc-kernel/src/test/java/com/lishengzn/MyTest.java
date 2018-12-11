@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,11 +29,18 @@ public class MyTest {
 
 	@Test
 	public void test1(){
-		 String[] str = new String[] { "you", "wu" };    
-		 List list = new ArrayList(Arrays.asList(str)); 
-		 str[0]="s1";
-		 System.out.println(list.get(0));
-		 list.add("yangguanbao"); 
+		System.out.println(Arrays.toString(SocketUtil.intToBytes(1)));
+		System.out.println(Arrays.toString(SocketUtil.intToBytes(-1)));
+		System.out.println(8>>2);
+		System.out.println(8<<2);
+		System.out.println(-8>>2);
+		System.out.println(-8<<2);
+		System.out.println(8>>>2);
+		System.out.println(-8>>>2);
+		System.out.println(-8>>>2);
+
+
+
 	}
 	
 	@Test

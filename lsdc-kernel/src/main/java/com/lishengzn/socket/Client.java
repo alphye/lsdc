@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import com.alibaba.druid.util.StringUtils;
 import com.lishengzn.constant.TopicAddressConstants;
 import com.lishengzn.service.WebSocketMsgService;
 import org.slf4j.Logger;
@@ -85,7 +86,7 @@ public class Client {
 			LOG.error("",e);
 			throw new SimpleException("无法连接到车辆，请确认车辆已开启！");
 		}
-		this.vehicle=new Vehicle();
+		this.vehicle=new Vehicle(new Coordinate(0,0));
 		vehicle.setNaviState(NaviStateEnum.IDLE.getValue());
 		listen2Server();
 		if(CacheManager.cache.get(CacheManager.clientPoolKey)==null){
@@ -108,27 +109,13 @@ public class Client {
 
 	}
 	private  void runRegrievalTask(Client client){
-		List<Integer> varIDList_high=new ArrayList<Integer>();
-		varIDList_high.add(LSConstants.VARID_POSITOIN);
-		varIDList_high.add(LSConstants.VARID_VELOCITY);
-		varIDList_high.add(LSConstants.VARID_CHARGESTATE);
-		varIDList_high.add(LSConstants.VARID_CHECKPACKAGE);
-		varIDList_high.add(LSConstants.VARID_FLIP_STATE);
-		varIDList_high.add(LSConstants.VARID_JACKING_DISTANCE);
-		varIDList_high.add(LSConstants.VARID_BELT_ROTATION_STATE);
-		varIDList_high.add(LSConstants.VARID_OPERATION_STATE);
-		CyclicTask task_high = new RetrievalAGVInfoTask(Integer.valueOf(kernelBaseLinebundle.getString("RetrievalAGVMsgTask_high_tSleep")), client,varIDList_high);
+		CyclicTask task_high = new RetrievalAGVInfoTask(Integer.valueOf(kernelBaseLinebundle.getString("RetrievalAGVMsgTask_high_tSleep")), client);
 		fixedThreadPool.execute(task_high);
 
-		List<Integer> varIDList_low=new ArrayList<Integer>();
-		varIDList_low.add(LSConstants.VARID_BATTERYCAPACITY);
-		CyclicTask task_low = new RetrievalAGVInfoTask(Integer.valueOf(kernelBaseLinebundle.getString("RetrievalAGVMsgTask_low_tSleep")), client,varIDList_low);
-		fixedThreadPool.execute(task_low);
-		
 	}
 	public void listen2Server() {
 		fixedThreadPool.execute(this::handleServerMsg);
-		fixedThreadPool.execute(this::sendHeartBeat);
+//		fixedThreadPool.execute(this::sendHeartBeat);
 	}
 	
 	/**
@@ -189,102 +176,58 @@ public class Client {
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
-			PacketModel packetModel = null;
+			String result ="";
 			try {
-				while (!terminate && (packetModel = SocketUtil.readNextPacketData(is)) != null) {
-					try {
-//				LOG.info("command:  " + packetModel.getPacketSerialNo() + "==" + packetModel.getPacketType() + "=="+ Arrays.toString(packetModel.getData_bytes()));
-						int packetType = packetModel.getPacketType();
-						// 这里是否考虑 每一种包类型的处理都开启单独的线程
-						if ( SocketUtil.getResponsePacketType(LSConstants.PACKET_TYPE_READVAR)==packetType) {
-							// 处理读取变量的应答包
-							PacketModel packetModel1=packetModel;
-							fixedThreadPool.execute(()->handleReadVarResponse(packetModel1));
+				while (!terminate) {
+					if(!StringUtils.isEmpty(result=SocketUtil.readLineSimpleProtocol(is))){
+						try {
+							LOG.info(result);
+							if(result.startsWith("Position")){// 读取当前位置
+								String xy=result.split("X:")[1];
+								xy=xy.replaceAll("\r\n","");
+								String x=xy.split("Y:")[0];
+								String y=xy.split("Y:")[1];
+								Coordinate coor = new Coordinate(Math.round(Double.valueOf(x)*100)/100.0,Math.round(Double.valueOf(y)*100)/100.0);
+								vehicle.setPosition(coor);
+							}
+							else if(result.startsWith("X: Speed:")){
+								String speed_x=result.replace("X: Speed:","");
+								vehicle.setVelocity_x(Double.valueOf(speed_x));
+							}
+							else if(result.startsWith("Y: Speed:")){
+								String speed_y=result.replace("Y: Speed:","");
+								vehicle.setVelocity_y(Double.valueOf(speed_y));
+							}
+							else if(result.startsWith("AGV Position")){
+								String xy=result.split("X:")[1];
+								xy=xy.replaceAll("\r\n","");
+								String x=xy.split("Y:")[0];
+								String y=xy.split("Y:")[1];
+								Coordinate coor = new Coordinate(Double.valueOf(x),Double.valueOf(y));
+								vehicle.setTargetPosition(coor);
+							}
+							else if(result.startsWith("Battery:")){
+								String battery=result.replace("Battery:","").replace("Ah","");
+								vehicle.setBatteryCapacity(Double.valueOf(battery));
+							}
+							else if(result.startsWith("Arriver")){
+								throw new SimpleException("导航完成！");
+							}
+							else if(result.startsWith("Pack Put Ok")){
+								throw new SimpleException("包裹投递完成！");
+							}
+
+							VehicleDto vehicleDto =BeanConvertUtil.beanConvert(vehicle, VehicleDto.class);
+							vehicleDto.setVehicleIp(this.ip);
+							TranslateUtil.translateEntity(vehicleDto);
+							CommandDto cmd = new CommandDto(CommandDto.TYPE.setVehicleInfo.name(), vehicleDto);
+							webSocketMsgService.sendToAll(TopicAddressConstants.setVehicleInfo,JSONObject.toJSONString(cmd));
+						} catch (SimpleException e) {
+							CommandDto cmd = new CommandDto(CommandDto.TYPE.error.name(), e.getMessage());
+							webSocketMsgService.sendToAll(TopicAddressConstants.error,JSONObject.toJSONString(cmd));
+						}catch (Exception e) {
+							LOG.error("解析小车答应信息异常!",e);
 						}
-						
-						else if (LSConstants.PACKET_TYPE_UP_STATE==(packetType)) {
-							// 处理agv上报状态
-							PacketModel packetModel1=packetModel;
-							fixedThreadPool.execute(()->handleUpState(packetModel1));
-						}
-						else if ( SocketUtil.getResponsePacketType(LSConstants.PACKET_TYPE_LOGIN_STR)==(packetType)) {
-							// 调度中心需要登录
-							// TODO
-						}
-						else if ( SocketUtil.getResponsePacketType(LSConstants.PACKET_TYPE_SEND_NAVITASK)==(packetType)) {
-							// 发送导航任务应答包
-							PacketModel packetModel1=packetModel;
-							fixedThreadPool.execute(()->handleSendNaviTaskResponse(packetModel1));
-				
-						}
-						else if ( SocketUtil.getResponsePacketType(LSConstants.PACKET_TYPE_CANCLE_NAVITASK)==(packetType)) {
-							// 取消导航任务应答包
-							PacketModel packetModel1=packetModel;
-							fixedThreadPool.execute(()->handleCancleNaviTaskResponse(packetModel1));
-				
-						}
-						else if ( SocketUtil.getResponsePacketType(LSConstants.PACKET_TYPE_PAUSE_NAVITASK)==(packetType)) {
-							// 暂停导航任务应答包
-							PacketModel packetModel1=packetModel;
-							fixedThreadPool.execute(()->handlePauseNaviTaskResponse(packetModel1));
-							
-						}
-						else if ( SocketUtil.getResponsePacketType(LSConstants.PACKET_TYPE_RECOVER_NAVITASK)==(packetType)) {
-							// 恢复导航任务应答包
-							PacketModel packetModel1=packetModel;
-							fixedThreadPool.execute(()->handleRecoverNaviTaskResponse(packetModel1));
-							
-						}
-						else if ( SocketUtil.getResponsePacketType(LSConstants.PACKET_TYPE_QUERY_NAVITRAILS)==(packetType)) {
-							// 查询导航轨迹应答包
-							PacketModel packetModel1=packetModel;
-							fixedThreadPool.execute(()->queryNaviTrailsResponse(packetModel1));
-							
-						}
-						else if ( SocketUtil.getResponsePacketType(LSConstants.PACKET_TYPE_APPEND_NAVITASK)==(packetType)) {
-							// 追加导航任务应答包
-							PacketModel packetModel1=packetModel;
-							fixedThreadPool.execute(()->handleAppendNaviTaskResponse(packetModel1));
-							
-						}
-						else if ( SocketUtil.getResponsePacketType(LSConstants.PACKET_TYPE_SEND_OPRTNTASK)==(packetType)) {
-							// 发送操作任务应答包
-							PacketModel packetModel1=packetModel;
-							fixedThreadPool.execute(()->handleSendOperationTaskResponse(packetModel1));
-							
-						}
-						else if ( SocketUtil.getResponsePacketType(LSConstants.PACKET_TYPE_CANCLE_OPRTNTASK)==(packetType)) {
-							// 取消操作任务应答包
-							PacketModel packetModel1=packetModel;
-							fixedThreadPool.execute(()->handleCanlceOperationTaskResponse(packetModel1));
-							
-						}
-						else if ( SocketUtil.getResponsePacketType(LSConstants.PACKET_TYPE_PAUSE_OPRTNTASK)==(packetType)) {
-							// 暂停操作任务应答包
-							PacketModel packetModel1=packetModel;
-							fixedThreadPool.execute(()->handlePauseOperationTaskResponse(packetModel1));
-							
-						}
-						else if ( SocketUtil.getResponsePacketType(LSConstants.PACKET_TYPE_RECOVER_OPRTNTASK)==(packetType)) {
-							// 恢复操作任务应答包
-							PacketModel packetModel1=packetModel;
-							fixedThreadPool.execute(()->handleRecoverOperationTaskResponse(packetModel1));
-							
-						}
-						else if ( SocketUtil.getResponsePacketType(LSConstants.PACKET_TYPE_WRITEVAR)==(packetType)) {
-							// 写变量应答包
-							PacketModel packetModel1=packetModel;
-							fixedThreadPool.execute(()->handleWriteVarResponse(packetModel1));
-							
-						}
-						else if ( SocketUtil.getResponsePacketType(LSConstants.PACKET_TYPE_CLEAR_ERROR)==(packetType)) {
-							// 清除错误应答包
-							PacketModel packetModel1=packetModel;
-							fixedThreadPool.execute(()->handleClearErrorResponse(packetModel1));
-							
-						}
-					} catch (Exception e) {
-						LOG.error("解析小车答应信息异常!",e);
 					}
 				}
 				LOG.info("handleServerMsg ===end");
@@ -1082,5 +1025,16 @@ public class Client {
 		return terminate;
 	}
 
-	
+
+	public void sendSimProToServer(String command) {
+		OutputStream os = null;
+		try {
+			os = socket.getOutputStream();
+			SocketUtil.sendSimpleProtocol(socket.getOutputStream(),command);
+
+		} catch (Exception e) {
+			LOG.error("指令发送异常",e);
+			close();
+		}
+	}
 }

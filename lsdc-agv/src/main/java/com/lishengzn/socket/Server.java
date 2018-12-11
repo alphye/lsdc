@@ -33,6 +33,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -131,6 +132,14 @@ class ClientHandler implements Runnable {
 	public void handleSocket() throws IOException {
 		lastHeartBeatTime = System.currentTimeMillis();// 启动监听之前先把lastHeartBeatTime初始化
 		new Thread(() -> listen2Server(socket)).start();
+		Scanner scanner = new Scanner(System.in);
+		while(!terminate){
+			if(scanner.hasNextLine()){
+				String str = scanner.nextLine()+"\r\n";
+				LOG.info("发送简单指令：{}",str);
+				socket.getOutputStream().write(str.getBytes());
+			}
+		}
 		/*
 		new Thread(() -> simulationVehicle01Move(socket)).start();
 		new Thread(() -> up_state()).start();
@@ -177,93 +186,16 @@ class ClientHandler implements Runnable {
 	
 	private void listen2Server(Socket socket) {
 		InputStream is = null;
+		String result ="";
 		try {
 			is = socket.getInputStream();
-			while (System.currentTimeMillis() - lastHeartBeatTime < 100000000) {// 心跳未超时
-				PacketModel packetModel = null;
-				// 如果能读取取数据包
-				if (!((packetModel = SocketUtil.readNextPacketData(is)) == null)) {
-					int packetType = packetModel.getPacketType();
-					if (LSConstants.PACKET_TYPE_READVAR == (packetType)) {
-						// 读取变量
-						PacketModel packetModel1=packetModel;
-						fixedThreadPool.execute(()->doReadVariable(packetModel1));
+			while (!terminate) {
+				if(((result=SocketUtil.readSimpleProtocol(is)) != null) && result.trim().length()>0){
+					if(",050E,0601,0600,".indexOf(","+result.toUpperCase()+",")<0){
+						LOG.info("收到简单指令：{}",result);
 					}
-					else if (LSConstants.PACKET_TYPE_HEART == (packetType)) {
-						this.lastHeartBeatTime = System.currentTimeMillis();
-						// 回复心跳包
-						LOG.info("------------pang  "+Server.vehicle01.getPosition());
-						packetModel.setPacketType(SocketUtil.getResponsePacketType(packetType));
-		    			packetModel.setData_bytes(new byte[0]);
-		    			packetModel.setErrorCode(LSConstants.ERROR_CODE_SUCCESS);
-		    			sendMsgToClient(packetModel);
-					}
-					else if (LSConstants.PACKET_TYPE_SEND_NAVITASK == (packetType)) {
-						// 发送导航任务
-						PacketModel packetModel1=packetModel;
-						fixedThreadPool.execute(()->doCarrayOutNaviTask(packetModel1));
-					}
-					else if (LSConstants.PACKET_TYPE_CANCLE_NAVITASK == (packetType)) {
-						// 取消导航任务
-						PacketModel packetModel1=packetModel;
-						fixedThreadPool.execute(()->doCancleNaviTask(packetModel1));
-					}
-					else if (LSConstants.PACKET_TYPE_PAUSE_NAVITASK == (packetType)) {
-						// 暂停导航任务
-						PacketModel packetModel1=packetModel;
-						fixedThreadPool.execute(()->doPauseNaviTask(packetModel1));
-					}
-					else if (LSConstants.PACKET_TYPE_RECOVER_NAVITASK == (packetType)) {
-						// 恢复导航任务
-						PacketModel packetModel1=packetModel;
-						fixedThreadPool.execute(()->doRecoverNaviTask(packetModel1));
-					}
-					else if (LSConstants.PACKET_TYPE_APPEND_NAVITASK == (packetType)) {
-						// 追加导航任务
-						PacketModel packetModel1=packetModel;
-						fixedThreadPool.execute(()->doAppendNaviTask(packetModel1));
-					}
-					else if (LSConstants.PACKET_TYPE_QUERY_NAVITRAILS == (packetType)) {
-						// 查询导航轨迹
-						PacketModel packetModel1=packetModel;
-						fixedThreadPool.execute(()->doQueryNaviTrails(packetModel1));
-					}
-					else if (LSConstants.PACKET_TYPE_SEND_OPRTNTASK == (packetType)) {
-						// 发送操作任务
-						PacketModel packetModel1=packetModel;
-						fixedThreadPool.execute(()->doCarrayOutOperationTask(packetModel1));
-					}
-					else if (LSConstants.PACKET_TYPE_CANCLE_OPRTNTASK == (packetType)) {
-						// 取消操作任务
-						PacketModel packetModel1=packetModel;
-						fixedThreadPool.execute(()->doCancleOperationTask(packetModel1));
-					}
-					else if (LSConstants.PACKET_TYPE_PAUSE_OPRTNTASK == (packetType)) {
-						// 暂停操作任务
-						PacketModel packetModel1=packetModel;
-						fixedThreadPool.execute(()->doPauseOperationTask(packetModel1));
-					}
-					else if (LSConstants.PACKET_TYPE_RECOVER_OPRTNTASK == (packetType)) {
-						// 恢复操作任务
-						PacketModel packetModel1=packetModel;
-						fixedThreadPool.execute(()->doRecoverOperationTask(packetModel1));
-					}
-					else if (LSConstants.PACKET_TYPE_WRITEVAR == (packetType)) {
-						// 写变量
-						PacketModel packetModel1=packetModel;
-						fixedThreadPool.execute(()->doWriteVarTask(packetModel1));
-					}
-					else if (LSConstants.PACKET_TYPE_CLEAR_ERROR == (packetType)) {
-						// 清除错误
-						PacketModel packetModel1=packetModel;
-						fixedThreadPool.execute(()->doClearError(packetModel1));
-					}
-					
 				}
 			}
-			// 走到这里，则说明超时未收到心跳
-			LOG.error("超时未收到心跳，连接关闭！{}", System.currentTimeMillis() - lastHeartBeatTime);
-			close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			close();
@@ -797,9 +729,7 @@ class ClientHandler implements Runnable {
 	}
 	
 	private ReadItem_Response responseBatteryCapacity(ReadItem item_request){
-		BatteryCapacityContent varContent  = new BatteryCapacityContent(Server.vehicle01.getBatteryCapacity(), Server.vehicle01.getBatteryResidues(), Server.vehicle01.getBatteryState());
-		ReadItem_Response response =new ReadItem_Response(item_request.getVarType(), item_request.getVarID(), 0,varContent.toBytes().length, varContent);
-		return response;
+		return null;
 	}
 
 	public void close() {

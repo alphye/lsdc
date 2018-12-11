@@ -1,7 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Title</title>
+    <title>车辆调控</title>
+    <link rel="icon" href="${pageContext.request.contextPath}/agvs/imgs/ls.ico" type="image/x-icon"/>
     <script src="${pageContext.request.contextPath}/agvs/js/Constants.json"></script>
     <script src="${pageContext.request.contextPath}/static_res/jquery.js"></script>
     <script src="${pageContext.request.contextPath}/static_res/sockjs.js"></script>
@@ -16,13 +17,12 @@
 
 </style>
 <body>
-<div id="navi"  style="width:99.5%;height:5%;">
+<div id="navi"  style="display:none">
     <span style="display: none;">${accountId}</span>
-    <button onclick="vehicleOnline();">车辆上线</button>
 </div>
 
 
-<div id="content" style="width:99.5%;height:95%;">
+<div id="content" style="width:99.5%;height:99.5%;">
     <iframe name="viewFrame" width="100%" height="100%" src="${pageContext.request.contextPath}/agvs/view.jsp"></iframe>
 </div>
 </body>

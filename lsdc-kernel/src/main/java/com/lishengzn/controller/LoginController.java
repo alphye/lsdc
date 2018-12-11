@@ -13,7 +13,7 @@ import javax.servlet.http.HttpSession;
 import java.util.UUID;
 
 @Controller
-@RequestMapping("login")
+@RequestMapping("main")
 public class LoginController {
     private static final Logger LOG = LoggerFactory.getLogger(LoginController.class);
 
@@ -22,9 +22,9 @@ public class LoginController {
         return "/login.jsp";
     }
 
-    @RequestMapping("login")
+    @RequestMapping("view")
     public String login(UserDto userDto, HttpServletRequest request){
-        LOG.info("用户登录：", JSONObject.toJSONString(userDto));
+//        LOG.info("用户登录：", JSONObject.toJSONString(userDto));
         HttpSession session = request.getSession(true);
         String accountID = "actid_"+ UUID.randomUUID();
         userDto.setAccountID(accountID);

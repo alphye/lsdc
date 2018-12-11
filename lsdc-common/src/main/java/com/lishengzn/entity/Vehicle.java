@@ -20,6 +20,8 @@ public class Vehicle implements Serializable{
 	 * 车辆位置
 	 */
 	private Coordinate position;
+
+	private Coordinate targetPosition;
 	
 	/**
 	 * x方向速度
@@ -121,7 +123,7 @@ public class Vehicle implements Serializable{
 	/**
 	 * 电池容量
 	 */
-	private int batteryCapacity;
+	private double batteryCapacity;
 	
 	/**
 	 * 电池余量
@@ -144,7 +146,7 @@ public class Vehicle implements Serializable{
 	public Vehicle(Coordinate position,  double velocity_x, double velocity_y, double velocity,
 			double angularVelocity, double acceleration, int angle, int pathId, int naviState, int confidenceDegree,
 			int radarCollisionAvoidance, int malfunction, int mileage, int contactChargingPile,int relayOn,int hasPackage,
-			int flipState,int jackingDistance,int beltRotationState,int operationState,int batteryCapacity,double batteryResidues,int batteryState) {
+			int flipState,int jackingDistance,int beltRotationState,int operationState,double batteryCapacity,double batteryResidues,int batteryState) {
 		super();
 		this.position = position;
 		this.velocity_x = velocity_x;
@@ -184,200 +186,208 @@ public class Vehicle implements Serializable{
 	public String getVehicleIp() {
 		return vehicleIp;
 	}
-	public synchronized Coordinate getPosition() {
+	public  Coordinate getPosition() {
 		return position;
 	}
 
-	public synchronized void setPosition(Coordinate position) {
+	public  void setPosition(Coordinate position) {
 		this.position = position;
 	}
 
-	public synchronized double getVelocity_x() {
+	public Coordinate getTargetPosition() {
+		return targetPosition;
+	}
+
+	public void setTargetPosition(Coordinate targetPosition) {
+		this.targetPosition = targetPosition;
+	}
+
+	public  double getVelocity_x() {
 		return velocity_x;
 	}
 
-	public synchronized void setVelocity_x(double velocity_x) {
+	public  void setVelocity_x(double velocity_x) {
 		this.velocity_x = velocity_x;
 	}
 
-	public synchronized double getVelocity_y() {
+	public  double getVelocity_y() {
 		return velocity_y;
 	}
 
-	public synchronized void setVelocity_y(double velocity_y) {
+	public  void setVelocity_y(double velocity_y) {
 		this.velocity_y = velocity_y;
 	}
 
-	public synchronized double getVelocity() {
+	public  double getVelocity() {
 		return velocity;
 	}
 
-	public synchronized void setVelocity(double velocity) {
+	public  void setVelocity(double velocity) {
 		this.velocity = velocity;
 	}
 
-	public synchronized double getAcceleration() {
+	public  double getAcceleration() {
 		return acceleration;
 	}
 
-	public synchronized void setAcceleration(double acceleration) {
+	public  void setAcceleration(double acceleration) {
 		this.acceleration = acceleration;
 	}
 
-	public synchronized double getAngle() {
+	public  double getAngle() {
 		return angle;
 	}
 
-	public synchronized void setAngle(double angle) {
+	public  void setAngle(double angle) {
 		this.angle = angle;
 	}
 
 
-	public synchronized int getPathId() {
+	public  int getPathId() {
 		return pathId;
 	}
 
-	public synchronized void setPathId(int pathId) {
+	public  void setPathId(int pathId) {
 		this.pathId = pathId;
 	}
 
-	public synchronized int getNaviState() {
+	public  int getNaviState() {
 		return naviState;
 	}
 
-	public  synchronized void setNaviState(int naviState) {
+	public   void setNaviState(int naviState) {
 		this.naviState = naviState;
 	}
 
 
 
-	public synchronized double getAngularVelocity() {
+	public  double getAngularVelocity() {
 		return angularVelocity;
 	}
 
 
 
-	public synchronized void setAngularVelocity(double angularVelocity) {
+	public  void setAngularVelocity(double angularVelocity) {
 		this.angularVelocity = angularVelocity;
 	}
 
 
 
-	public synchronized int getConfidenceDegree() {
+	public  int getConfidenceDegree() {
 		return confidenceDegree;
 	}
 
 
 
-	public synchronized void setConfidenceDegree(int confidenceDegree) {
+	public  void setConfidenceDegree(int confidenceDegree) {
 		this.confidenceDegree = confidenceDegree;
 	}
 
 
 
-	public synchronized int getRadarCollisionAvoidance() {
+	public  int getRadarCollisionAvoidance() {
 		return radarCollisionAvoidance;
 	}
 
 
 
-	public synchronized void setRadarCollisionAvoidance(int radarCollisionAvoidance) {
+	public  void setRadarCollisionAvoidance(int radarCollisionAvoidance) {
 		this.radarCollisionAvoidance = radarCollisionAvoidance;
 	}
 
 
 
-	public synchronized int getMalfunction() {
+	public  int getMalfunction() {
 		return malfunction;
 	}
 
 
 
-	public synchronized void setMalfunction(int malfunction) {
+	public  void setMalfunction(int malfunction) {
 		this.malfunction = malfunction;
 	}
 
 
 
-	public synchronized long getMileage() {
+	public  long getMileage() {
 		return mileage;
 	}
 
 
 
-	public synchronized void setMileage(long mileage) {
+	public  void setMileage(long mileage) {
 		this.mileage = mileage;
 	}
-	public synchronized int getContactChargingPile() {
+	public  int getContactChargingPile() {
 		return contactChargingPile;
 	}
-	public synchronized void setContactChargingPile(int contactChargingPile) {
+	public  void setContactChargingPile(int contactChargingPile) {
 		this.contactChargingPile = contactChargingPile;
 	}
-	public synchronized int getHasPackage() {
+	public  int getHasPackage() {
 		return hasPackage;
 	}
-	public synchronized void setHasPackage(int hasPackage) {
+	public  void setHasPackage(int hasPackage) {
 		this.hasPackage = hasPackage;
 	}
-	public synchronized int getFlipState() {
+	public  int getFlipState() {
 		return flipState;
 	}
-	public synchronized void setFlipState(int flipState) {
+	public  void setFlipState(int flipState) {
 		this.flipState = flipState;
 	}
-	public synchronized int getJackingDistance() {
+	public  int getJackingDistance() {
 		return jackingDistance;
 	}
-	public synchronized void setJackingDistance(int jackingDistance) {
+	public  void setJackingDistance(int jackingDistance) {
 		this.jackingDistance = jackingDistance;
 	}
-	public synchronized int getBeltRotationState() {
+	public  int getBeltRotationState() {
 		return beltRotationState;
 	}
-	public synchronized void setBeltRotationState(int beltRotationState) {
+	public  void setBeltRotationState(int beltRotationState) {
 		this.beltRotationState = beltRotationState;
 	}
-	public synchronized int getOperationState() {
+	public  int getOperationState() {
 		return operationState;
 	}
-	public synchronized void setOperationState(int operationState) {
+	public  void setOperationState(int operationState) {
 		this.operationState = operationState;
 	}
-	public synchronized int getBatteryCapacity() {
+	public  double getBatteryCapacity() {
 		return batteryCapacity;
 	}
-	public synchronized void setBatteryCapacity(int batteryCapacity) {
+	public  void setBatteryCapacity(double batteryCapacity) {
 		this.batteryCapacity = batteryCapacity;
 	}
-	public synchronized double getBatteryResidues() {
+	public  double getBatteryResidues() {
 		return batteryResidues;
 	}
-	public synchronized void setBatteryResidues(double batteryResidues) {
+	public  void setBatteryResidues(double batteryResidues) {
 		this.batteryResidues = batteryResidues;
 	}
-	public synchronized int getBatteryState() {
+	public  int getBatteryState() {
 		return batteryState;
 	}
-	public synchronized void setBatteryState(int batteryState) {
+	public  void setBatteryState(int batteryState) {
 		this.batteryState = batteryState;
 	}
-	public synchronized int getRelayOn() {
+	public  int getRelayOn() {
 		return relayOn;
 	}
-	public synchronized void setRelayOn(int relayOn) {
+	public  void setRelayOn(int relayOn) {
 		this.relayOn = relayOn;
 	}
-	public synchronized String getNaviStateName() {
+	public  String getNaviStateName() {
 		return naviStateName;
 	}
-	public synchronized void setNaviStateName(String naviStateName) {
+	public  void setNaviStateName(String naviStateName) {
 		this.naviStateName = naviStateName;
 	}
-	public synchronized String getOperationStateName() {
+	public  String getOperationStateName() {
 		return operationStateName;
 	}
-	public synchronized void setOperationStateName(String operationStateName) {
+	public  void setOperationStateName(String operationStateName) {
 		this.operationStateName = operationStateName;
 	}
 	@Override

@@ -56,7 +56,7 @@ public class WebSocketMsgServiceImpl implements WebSocketMsgService {
             String ip=ipArray[i].split(":")[0];
             int port=Integer.valueOf(ipArray[i].split(":")[1]);
             new Client(ip,port, this);
-            threadPool.execute(new FullDispatchTask(Integer.valueOf(fullDispatchTask_tSleep),this));
+//            threadPool.execute(new FullDispatchTask(Integer.valueOf(fullDispatchTask_tSleep),this));
             CommandDto command = new CommandDto(CommandDto.TYPE.setVehicleInIp.name(),ip);
             sendToAll(TopicAddressConstants.setVehicleInIp,JSONObject.toJSONString(command));
         }
@@ -72,4 +72,5 @@ public class WebSocketMsgServiceImpl implements WebSocketMsgService {
         Client client =((Map<String,Client>) CacheManager.cache.get(CacheManager.clientPoolKey)).remove(ip);
         client.close();
     }
+
 }

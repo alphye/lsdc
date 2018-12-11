@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.lishengzn.constant.TopicAddressConstants;
 import com.lishengzn.dto.CommandDto;
 import com.lishengzn.dto.OperationCommandDto;
+import com.lishengzn.dto.SimProCommandDto;
 import com.lishengzn.dto.VehicleMoveDto;
 import com.lishengzn.entity.read.ReadItem_Request;
 import com.lishengzn.entity.read.ReadVariable;
@@ -81,7 +82,8 @@ public class WebSocketController {
        LOG.info("收到取消导航任务：{}", JSONObject.toJSONString(commandDto));
         VehicleMoveDto vehicleMove = JSONObject.parseObject(JSONObject.toJSONString(commandDto.getMessage()),VehicleMoveDto.class);
         Map<String,Client> clientMap =(Map<String,Client>) CacheManager.cache.get(CacheManager.clientPoolKey);
-        Client client = clientMap.get(vehicleMove.getVehicleIp());
+        Client client = getClientByIp(vehicleMove.getVehicleIp());
+        
         client.cancleNaviTask();
     }
 
@@ -92,8 +94,7 @@ public class WebSocketController {
     public void pauseNaviTask(CommandDto commandDto){
        LOG.info("收到暂停导航任务：{}", JSONObject.toJSONString(commandDto));
         VehicleMoveDto vehicleMove = JSONObject.parseObject(JSONObject.toJSONString(commandDto.getMessage()),VehicleMoveDto.class);
-        Map<String,Client> clientMap =(Map<String,Client>)CacheManager.cache.get(CacheManager.clientPoolKey);
-        Client client = clientMap.get(vehicleMove.getVehicleIp());
+        Client client = getClientByIp(vehicleMove.getVehicleIp());
         client.pauseNaviTask();
     }
 
@@ -104,8 +105,7 @@ public class WebSocketController {
     public void recoverNaviTask(CommandDto commandDto){
        LOG.info("收到恢复导航任务：{}",  JSONObject.toJSONString(commandDto));
         VehicleMoveDto vehicleMove = JSONObject.parseObject(JSONObject.toJSONString(commandDto.getMessage()),VehicleMoveDto.class);
-        Map<String,Client> clientMap =(Map<String,Client>)CacheManager.cache.get(CacheManager.clientPoolKey);
-        Client client = clientMap.get(vehicleMove.getVehicleIp());
+        Client client = getClientByIp(vehicleMove.getVehicleIp());
         client.recoverNaviTask();
     }
 
@@ -116,8 +116,7 @@ public class WebSocketController {
     public void queryNaviTrails(CommandDto commandDto){
        LOG.info("收到查询导航轨迹任务：{}", JSONObject.toJSONString(commandDto));
         VehicleMoveDto vehicleMove = JSONObject.parseObject(JSONObject.toJSONString(commandDto.getMessage()),VehicleMoveDto.class);
-        Map<String,Client> clientMap =(Map<String,Client>)CacheManager.cache.get(CacheManager.clientPoolKey);
-        Client client = clientMap.get(vehicleMove.getVehicleIp());
+        Client client = getClientByIp(vehicleMove.getVehicleIp());
         client.queryNaviTrails();
     }
 
@@ -128,8 +127,7 @@ public class WebSocketController {
     public void appendNaviTaskWidthCellNum(CommandDto commandDto){
        LOG.info("收到追加导航任务：{}", JSONObject.toJSONString(commandDto));
         VehicleMoveDto vehicleMove = JSONObject.parseObject(JSONObject.toJSONString(commandDto.getMessage()),VehicleMoveDto.class);
-        Map<String,Client> clientMap =(Map<String,Client>)CacheManager.cache.get(CacheManager.clientPoolKey);
-        Client client = clientMap.get(vehicleMove.getVehicleIp());
+        Client client = getClientByIp(vehicleMove.getVehicleIp());
         client.appendNaviTaskWidthCellNum(vehicleMove);
     }
 
@@ -140,8 +138,7 @@ public class WebSocketController {
     public void sendOperationTask(CommandDto commandDto){
        LOG.info("收到发送操作任务：{}", JSONObject.toJSONString(commandDto));
         OperationCommandDto operationCommandDto = JSONObject.parseObject(JSONObject.toJSONString(commandDto.getMessage()),OperationCommandDto.class);
-        Map<String,Client> clientMap =(Map<String,Client>)CacheManager.cache.get(CacheManager.clientPoolKey);
-        Client client = clientMap.get(operationCommandDto.getVehicleIp());
+        Client client = getClientByIp(operationCommandDto.getVehicleIp());
         client.sendOperationTask(operationCommandDto);
     }
 
@@ -152,8 +149,7 @@ public class WebSocketController {
     public void cancleOperationTask(CommandDto commandDto){
        LOG.info("收到取消操作任务：{}", JSONObject.toJSONString(commandDto));
         OperationCommandDto operationCommandDto = JSONObject.parseObject(JSONObject.toJSONString(commandDto.getMessage()),OperationCommandDto.class);
-        Map<String,Client> clientMap =(Map<String,Client>)CacheManager.cache.get(CacheManager.clientPoolKey);
-        Client client = clientMap.get(operationCommandDto.getVehicleIp());
+        Client client = getClientByIp(operationCommandDto.getVehicleIp());
         client.cancleOperationTask(operationCommandDto);
     }
 
@@ -164,8 +160,7 @@ public class WebSocketController {
     public void pauseOperationTask(CommandDto commandDto){
        LOG.info("收到暂停操作任务：{}", JSONObject.toJSONString(commandDto));
         OperationCommandDto operationCommandDto = JSONObject.parseObject(JSONObject.toJSONString(commandDto.getMessage()),OperationCommandDto.class);
-        Map<String,Client> clientMap =(Map<String,Client>)CacheManager.cache.get(CacheManager.clientPoolKey);
-        Client client = clientMap.get(operationCommandDto.getVehicleIp());
+        Client client = getClientByIp(operationCommandDto.getVehicleIp());
         client.pauseOperationTask(operationCommandDto);
     }
 
@@ -176,8 +171,7 @@ public class WebSocketController {
     public void recoverOperationTask(CommandDto commandDto){
        LOG.info("收到恢复操作任务：{}", JSONObject.toJSONString(commandDto));
         OperationCommandDto operationCommandDto = JSONObject.parseObject(JSONObject.toJSONString(commandDto.getMessage()),OperationCommandDto.class);
-        Map<String,Client> clientMap =(Map<String,Client>)CacheManager.cache.get(CacheManager.clientPoolKey);
-        Client client = clientMap.get(operationCommandDto.getVehicleIp());
+        Client client = getClientByIp(operationCommandDto.getVehicleIp());
         client.recoverOperationTask(operationCommandDto);
     }
 
@@ -188,8 +182,7 @@ public class WebSocketController {
     public void stopCharge(CommandDto commandDto){
        LOG.info("收到停止充电任务：{}", JSONObject.toJSONString(commandDto));
         OperationCommandDto operationCommandDto = JSONObject.parseObject(JSONObject.toJSONString(commandDto.getMessage()),OperationCommandDto.class);
-        Map<String,Client> clientMap =(Map<String,Client>)CacheManager.cache.get(CacheManager.clientPoolKey);
-        Client client = clientMap.get(operationCommandDto.getVehicleIp());
+        Client client = getClientByIp(operationCommandDto.getVehicleIp());
         client.controlCharge(LSConstants.CONTROLCHARGE_STOP);
     }
 
@@ -200,8 +193,7 @@ public class WebSocketController {
     public void startCharge(CommandDto commandDto){
        LOG.info("收到开始充电任务：{}", JSONObject.toJSONString(commandDto));
         OperationCommandDto operationCommandDto = JSONObject.parseObject(JSONObject.toJSONString(commandDto.getMessage()),OperationCommandDto.class);
-        Map<String,Client> clientMap =(Map<String,Client>)CacheManager.cache.get(CacheManager.clientPoolKey);
-        Client client = clientMap.get(operationCommandDto.getVehicleIp());
+        Client client = getClientByIp(operationCommandDto.getVehicleIp());
         client.controlCharge(LSConstants.CONTROLCHARGE_START);
     }
 
@@ -212,8 +204,7 @@ public class WebSocketController {
     public void packageSize(CommandDto commandDto){
        LOG.info("收到写入包裹大小任务：{}", JSONObject.toJSONString(commandDto));
         VehicleMoveDto vehicleMove = JSONObject.parseObject(JSONObject.toJSONString(commandDto.getMessage()),VehicleMoveDto.class);
-        Map<String,Client> clientMap =(Map<String,Client>)CacheManager.cache.get(CacheManager.clientPoolKey);
-        Client client = clientMap.get(vehicleMove.getVehicleIp());
+        Client client = getClientByIp(vehicleMove.getVehicleIp());
         client.writePakageSize(vehicleMove);
     }
 
@@ -224,9 +215,23 @@ public class WebSocketController {
     public void clearError(CommandDto commandDto){
        LOG.info("收到清除错误任务：{}", JSONObject.toJSONString(commandDto));
         OperationCommandDto operationCommandDto = JSONObject.parseObject(JSONObject.toJSONString(commandDto.getMessage()),OperationCommandDto.class);
-        Map<String,Client> clientMap =(Map<String,Client>)CacheManager.cache.get(CacheManager.clientPoolKey);
-        Client client = clientMap.get(operationCommandDto.getVehicleIp());
+        Client client = getClientByIp(operationCommandDto.getVehicleIp());
         client.clearError();
+    }
+
+    @MessageMapping("/sendSimpProCmd")
+    public void sendSimpProToServer(CommandDto commandDto){
+        LOG.info("收到简单协议指令：{}", JSONObject.toJSONString(commandDto));
+        SimProCommandDto simProCommandDto = JSONObject.parseObject(JSONObject.toJSONString(commandDto.getMessage()),SimProCommandDto.class);
+        Client client = getClientByIp(simProCommandDto.getVehicleIp());
+        client.sendSimProToServer(simProCommandDto.getParam());
+        if(",13".indexOf(","+simProCommandDto.getParam().substring(0,2))>=0){
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+            }
+            client.sendSimProToServer("090E");
+        }
     }
 
     @MessageExceptionHandler
@@ -265,8 +270,19 @@ public class WebSocketController {
         packetModel.setErrorCode(LSConstants.ERROR_CODE_SUCCESS);
 
         OperationCommandDto operationCommandDto = JSONObject.parseObject(JSONObject.toJSONString(commandDto.getMessage()),OperationCommandDto.class);
-        Map<String,Client> clientMap =(Map<String,Client>)CacheManager.cache.get(CacheManager.clientPoolKey);
-        Client client = clientMap.get(operationCommandDto.getVehicleIp());
+        Client client = getClientByIp(operationCommandDto.getVehicleIp());
         client.sendMsgToServer(packetModel);
+    }
+
+    private Client getClientByIp(String vehicleIp){
+        Map<String,Client> clientMap22 =(Map<String,Client>)CacheManager.cache.get(CacheManager.clientPoolKey);
+        if (clientMap22 ==null) {
+            throw new SimpleException("车辆尚未上线！");
+        }
+        Client client = clientMap22.get(vehicleIp);
+        if (client ==null) {
+            throw new SimpleException("车辆尚未上线！");
+        }
+        return client;
     }
 }

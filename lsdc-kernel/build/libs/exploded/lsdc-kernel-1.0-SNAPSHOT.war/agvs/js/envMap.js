@@ -30,37 +30,112 @@
 		  });
 	});
 	function onRectContextMenu(e){
-		var winWidth = $(document).width();
-		var winHeight = $(document).height();
-		var posX = e.pageX;
-		var posY = e.pageY;
-		var menuWidth = $(".contextmenu").width();
-		var menuHeight = $(".contextmenu").height();
-		var secMargin = 10;
-		if(posX + menuWidth + secMargin >= winWidth
-		&& posY + menuHeight + secMargin >= winHeight){
-		  posLeft = posX - menuWidth - secMargin + "px";
-		  posTop = posY - menuHeight - secMargin + "px";
-		}
-		else if(posX + menuWidth + secMargin >= winWidth){
-		  posLeft = posX - menuWidth - secMargin + "px";
-		  posTop = posY + secMargin + "px";
-		}
-		else if(posY + menuHeight + secMargin >= winHeight){
-		  posLeft = posX + secMargin + "px";
-		  posTop = posY - menuHeight - secMargin + "px";
-		}
-		else {
-		  posLeft = posX + secMargin + "px";
-		  posTop = posY + secMargin + "px";
-		};
-		$(".contextmenu").css({
-		  "left": posLeft,
-		  "top": posTop
-		}).show();
-		return false;
-		
-}
+        showContextMenu("contextmenu1",e);
+        hidenContextMenu2();
+        return false;
+    }
+
+    function showContextMenu(menuID,e){
+        var winWidth = $(document).width();
+        var winHeight = $(document).height();
+        var posX = e.pageX;
+        var posY = e.pageY;
+        var menuWidth = $("#"+menuID).width();
+        var menuHeight = $("#"+menuID).height();
+        var secMargin = 10;
+        if(posX + menuWidth + secMargin >= winWidth
+            && posY + menuHeight + secMargin >= winHeight){
+            posLeft = posX - menuWidth - secMargin + "px";
+            posTop = posY - menuHeight - secMargin + "px";
+        }
+        else if(posX + menuWidth + secMargin >= winWidth){
+            posLeft = posX - menuWidth - secMargin + "px";
+            posTop = posY + secMargin + "px";
+        }
+        else if(posY + menuHeight + secMargin >= winHeight){
+            posLeft = posX + secMargin + "px";
+            posTop = posY - menuHeight - secMargin + "px";
+        }
+        else {
+            posLeft = posX + secMargin + "px";
+            posTop = posY + secMargin + "px";
+        };
+        $("#"+menuID).css({
+            "left": posLeft,
+            "top": posTop
+        }).show();
+        return false;
+    }
+
+    function selectNaviPoints(e,th){
+        $("#contextmenu3").hide();
+        var winWidth = $(document).width();
+        var winHeight = $(document).height();
+        var posX=$("#contextmenu1").offset().left+$("#contextmenu1").width()-5;
+        var posY=$("#contextmenu1").offset().top-10;
+        var menuWidth = $("#contextmenu2").width();
+        var menuHeight = $("#contextmenu2").height();
+        var secMargin = 10;
+        if(posX + menuWidth + secMargin >= winWidth
+            && posY + menuHeight + secMargin >= winHeight){
+            posLeft = posX - menuWidth - secMargin + "px";
+            posTop = posY - menuHeight + ($(th).height())+18 + "px";
+        }
+        else if(posX + menuWidth + secMargin >= winWidth){
+            posLeft = posX - menuWidth - secMargin + "px";
+            posTop = posY + secMargin + "px";
+        }
+        else if(posY + menuHeight + secMargin >= winHeight){
+            posLeft = posX + secMargin + "px";
+            posTop = posY - menuHeight  + ($(th).height())+18  + "px";
+        }
+        else {
+            posLeft = posX + secMargin + "px";
+            posTop = posY + secMargin + "px";
+        };
+        $("#contextmenu2").css({
+            "left": posLeft,
+            "top": posTop
+        }).show();
+        return false;
+    }
+    function selectPackageDirection(e,th){
+        $("#contextmenu2").hide();
+        var winWidth = $(document).width();
+        var winHeight = $(document).height();
+        var posX=$("#contextmenu1").offset().left+$("#contextmenu1").width()-5;
+        var posY=$("#contextmenu1").offset().top-10;
+        var menuWidth = $("#contextmenu3").width();
+        var menuHeight = $("#contextmenu3").height();
+        var secMargin = 10;
+        if(posX + menuWidth + secMargin >= winWidth
+            && posY + menuHeight + secMargin >= winHeight){
+            posLeft = posX - menuWidth - secMargin + "px";
+            posTop = posY - menuHeight + ($(th).height())+18 + "px";
+        }
+        else if(posX + menuWidth + secMargin >= winWidth){
+            posLeft = posX - menuWidth - secMargin + "px";
+            posTop = posY + secMargin + "px";
+        }
+        else if(posY + menuHeight + secMargin >= winHeight){
+            posLeft = posX + secMargin + "px";
+            posTop = posY - menuHeight  + ($(th).height())+18  + "px";
+        }
+        else {
+            posLeft = posX + secMargin + "px";
+            posTop = posY + secMargin + "px";
+        };
+        $("#contextmenu3").css({
+            "left": posLeft,
+            "top": posTop
+        }).show();
+        return false;
+    }
+
+    function hidenContextMenu2(){
+        $("#contextmenu2").hide();
+        $("#contextmenu3").hide();
+    }
 	function initialize(){
 		// 真实地图的宽高比如果比屏幕的宽高比大，则要将<SVG>的width扩大。否则会显示不全
 		var n=realMapWidth/realMapHeight-screenWidth/screenHeight;
@@ -241,3 +316,25 @@
          }
 		
 	}
+
+	function vehicleOnline(){
+	    window.top.vehicleOnline();
+    }
+
+    function donone(){
+        cancelBubble();
+	    return false;
+    }
+
+    function cancelBubble(e) {
+        var evt = e ? e : window.event;
+        if (evt.stopPropagation) {        //W3C
+            evt.stopPropagation();
+        }else {       //IE
+            evt.cancelBubble = true;
+        }
+    }
+
+    function sendSimProCmd(param) {
+        window.parent.sendSimProCmd(param);
+    }

@@ -163,14 +163,21 @@ iframe{
 		<div id="content" class="content" align="left">
 			<div class="west">
 				<div id="vehicleInfo" class="vehicleInfo" align="center">
-					<input type="hidden" id="vehicleIp"/>
-					<table style="position: relative;top: 20%;">
+                    <div class="diff1">车辆基本信息</div>
+					<table style="position: relative;top: 15%;">
+						<tr class='distant-top'>
+							<td class="lable">车辆 IP：</td>
+							<td class="cnt" id="vehicleIp"></td>
+						</tr>
 						<tr class='outlinedA'>
 							<td class="lable">当前位置：</td>
 							<td class="cnt" id="vehicle_position">0,0</td>
 						</tr>
-						
-						<tr class='distant-top'>
+                        <tr class='outlinedA'>
+                            <td class="lable">目标位置：</td>
+                            <td class="cnt" id="vehicle_targetPosition">0,0</td>
+                        </tr>
+						<%--<tr class='distant-top'>
 							<td class="lable">导航状态：</td>
 							<td class="cnt"  id="vehicle_naviState"></td>
 						</tr>
@@ -178,26 +185,26 @@ iframe{
 						<tr class='distant-top'>
 							<td class="lable">操作状态：</td>
 							<td class="cnt"  id="vehicle_operationState"></td>
-						</tr>
+						</tr>--%>
 						
 						<tr class="outlinedB">
-							<td class="lable">横向速度：</td>
+							<td class="lable">X方向速度：</td>
 							<td class="cnt" ><span id="vehicle_vx">0</span> mm/s</td>
 						</tr>
 
 						<tr class="outlinedB">
-							<td class="lable">纵向速度：</td>
+							<td class="lable">Y方向速度：</td>
 							<td class="cnt" ><span id="vehicle_vy">0</span> mm/s</td>
 						</tr>
 						
-						<tr class="hsl">
+					<%--	<tr class="hsl">
 							<td class="lable">总里程数：</td>
 							<td class="cnt" ><span id="vehicle_mileage">0</span> mm</td>
-						</tr>
+						</tr>--%>
 						
 						<tr class="distant-front">
-							<td class="lable">剩余电量：</td>
-							<td class="cnt"><span id="vehicle_batteryResidues">100</span>%</td>
+							<td class="lable">电池电量：</td>
+							<td class="cnt"><span id="vehicle_batteryCapacity">0</span> Ah</td>
 						</tr>
 						<tr style="display:none">
 							<td class="label" >
@@ -213,101 +220,104 @@ iframe{
 					
 				</div>
 				<div class="operationArea" style="width:100%" align="center">
-					<table style="width:95%;text-align:center;">
-						<tr>
-							<td><span class="erode">发送导航</span></td><td style="width:30%;">&nbsp;</td><td> <span class="erode">追加导航</span></td>
-						</tr>
-						
-						<tr>
-							<td>
-								<table style="width:100%">
-									<tr>
-										<td></td>
-										<td align="center" style="width:30%;">
-											<div class="to_top btn" onclick=move(3)></div>
-										</td>
-										<td></td>
-										
-									</tr>
-									
-									<tr>
-										<td align="right">
-											<div class="to_left btn" onclick=move(2)></div>
-										</td>
-										<td><input id="moveCells" style="width: 2vw; background: #82abd0;text-align:center;" /></td>
-										<td>
-											<div class="to_right btn" onclick=move(1)></div>
-											
-										</td>
-										
-									</tr>
-									
-									<tr>
-										<td></td>
-										<td align="center">
-											<div  class=" to_bottom btn" onclick=move(4)></div>
-										</td>
-										<td></td>
-									</tr>
-								</table>
-							</td>
-							<td><a onclick="clearError()" class="blue button">清除错误</a></td>
-							<td>
-								<table style="width:100%">
-									<tr>
-										<td></td>
-										<td align="center" style="width:30%;">
-											<div class="to_top btn" onclick=appendTrail(3)></div>
-										</td>
-										<td></td>
-										
-									</tr>
-									
-									<tr>
-										<td align="right">
-											<div class="to_left btn" onclick=appendTrail(2)></div>
-										</td>
-										<td><input id="appendCells" style="width: 2vw; background: #82abd0;text-align:center;" /></td>
-										<td>
-											<div class="to_right btn" onclick=appendTrail(1)></div>
-											
-										</td>
-										
-									</tr>
-									
-									<tr>
-										<td></td>
-										<td align="center">
-											<div  class=" to_bottom btn" onclick=appendTrail(4)></div>
-										</td>
-										<td></td>
-									</tr>
-								</table>
-							</td>
-						</tr>
-						
-						<tr>
-							<td></td>
-							<td></td>
-							<td></td>
-						</tr>
-						<tr>
-							<td><a onclick="modifyNaviTask('cancleNaviTask')" class="blue button">取消导航</a></td>
-							<td><a onclick="modifyNaviTask('pauseNaviTask')" class="blue button">暂停导航</a></td>
-							<td><a onclick="modifyNaviTask('recoverNaviTask')" class="blue button">恢复导航</a></td>
-						</tr>
-						<tr>
-							<td><a onclick="beltRotationOn()" class="blue button">皮带转动</a></td>
-							<td><a onclick="beltRotationStop()" class="blue button">停止转动</a></td>
-							<td><a onclick="beltRotationOnAndStop()" class="blue button">转动后停止</a></td>
-						</tr>
-						<tr>
-							<td><a onclick="modifyOperationTask('cancleOperationTask')" class="blue button">取消操作</a></td>
-							<td><a onclick="modifyOperationTask('pauseOperationTask')" class="blue button">暂停操作</a></td>
-							<td><a onclick="modifyOperationTask('recoverOperationTask')" class="blue button">恢复操作</a></td>
-						</tr>
-					</table>
-					
+                    <table style="width:95%;text-align:center;">
+                        <tbody>
+                        <tr>
+                            <td><span class="erode">行进10mm</span></td><td style="width:30%;">&nbsp;</td><td> <span class="erode">行进一格</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <table style="width:100%">
+                                    <tbody><tr>
+                                        <td></td>
+                                        <td align="center" style="width:30%;">
+                                            <div class="to_top btn" onclick="sendSimProCmd('0201');"></div>
+                                        </td>
+                                        <td></td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td align="right">
+                                            <div class="to_left btn" onclick="sendSimProCmd('0100');"></div>
+                                        </td>
+                                        <td><span class="erode"></span></td>
+                                        <td>
+                                            <div class="to_right btn" onclick="sendSimProCmd('0101');"></div>
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td></td>
+                                        <td align="center">
+                                            <div class=" to_bottom btn" onclick="sendSimProCmd('0200');"></div>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+
+                            <td>
+                                <a onclick="vehicleOnline();" class="blue button">车辆上线</a>
+                            </td>
+                            <td>
+                                <table style="width:100%">
+                                    <tbody><tr>
+                                        <td></td>
+                                        <td align="center" style="width:30%;">
+                                            <div class="to_top btn" onclick="sendSimProCmd('0201');"></div>
+                                        </td>
+                                        <td></td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td align="right">
+                                            <div class="to_left btn" onclick="sendSimProCmd('0100');"></div>
+                                        </td>
+                                        <td><span class="erode"></span></td>
+                                        <td>
+                                            <div class="to_right btn" onclick="sendSimProCmd('0101');"></div>
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td></td>
+                                        <td align="center">
+                                            <div class=" to_bottom btn" onclick="sendSimProCmd('0200');"></div>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><a onclick="sendSimProCmd('1001');" class="blue button">软件急停</a></td>
+                            <td><a onclick="sendSimProCmd('1000');" class="blue button">清除急停</a></td>
+                            <td><a onclick="sendSimProCmd('330E');" class="blue button">启动转台</a></td>
+                        </tr>
+                        <tr>
+                            <td><a onclick="sendSimProCmd('3501');" class="blue button">滚筒正转</a></td>
+                            <td><a onclick="sendSimProCmd('3601');" class="blue button">滚筒反转</a></td>
+                            <td><a onclick="sendSimProCmd('3600');" class="blue button">滚筒停止</a></td>
+                        </tr>
+                        <tr>
+                            <td><a onclick="sendSimProCmd('3701');" class="blue button">开启充电</a></td>
+                            <td><a onclick="sendSimProCmd('3700');" class="blue button">停止充电</a></td>
+                            <td><a onclick="sendSimProCmd('320E');" class="blue button">车辆重启</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
 					
 				</div>
 			</div>

@@ -64,7 +64,7 @@ public class SocketUtil {
 	/**
 	 * byte[]转int 大端
 	 * 
-	 * @param bytes
+	 * @param src
 	 * @return
 	 */
 	public static int bytesToInt_b(byte[] src) {
@@ -92,7 +92,7 @@ public class SocketUtil {
 	 * byte[]转int 的另一种实现方式 大端
 	 * 
 	 * @param src
-	 * @param byteOrder
+	 * @param src
 	 * @return
 	 */
 	public static int bytes2Int(byte[] src) {
@@ -441,4 +441,26 @@ public class SocketUtil {
 		return responsePacketType;
 	}
 
+
+	public static void sendSimpleProtocol(OutputStream out, String command) throws IOException {
+		synchronized (out) {
+			byte[] sendBytes = hexToBytes(command);
+			out.write(sendBytes);
+		}
+	}
+
+
+	public static String readLineSimpleProtocol(InputStream in) throws IOException {
+		String result="";
+		BufferedReader bf = new BufferedReader(new InputStreamReader(in));
+		result=bf.readLine();
+		return result;
+	}
+	public static String readSimpleProtocol(InputStream in) throws IOException {
+		String result="";
+		byte[] bytes = new byte[2];
+		while (in.read(bytes)<=0){}
+		result=bytesToHex(bytes);
+		return result;
+	}
 }

@@ -18,24 +18,9 @@ import com.lishengzn.util.LSConstants;
 public class RetrievalAGVInfoTask extends CyclicTask{
 	private static final Logger LOG=LoggerFactory.getLogger(RetrievalAGVInfoTask.class);
 	private Client client;
-	private List<Integer> varIDList;
-	private static final Map<Integer,ReadItem_Request>requestVariableMap=new HashMap<Integer,ReadItem_Request>();
-	static{
-		requestVariableMap.put(LSConstants.VARID_POSITOIN, new ReadItem_Request(LSConstants.VARTYPE_POSITOIN,LSConstants.VARID_POSITOIN,0,0));
-		requestVariableMap.put(LSConstants.VARID_VELOCITY, new ReadItem_Request(LSConstants.VARTYPE_VELOCITY,LSConstants.VARID_VELOCITY,0,0));
-		requestVariableMap.put(LSConstants.VARID_CHARGESTATE, new ReadItem_Request(LSConstants.VARTYPE_CHARGESTATE,LSConstants.VARID_CHARGESTATE,0,0));
-		requestVariableMap.put(LSConstants.VARID_CHECKPACKAGE, new ReadItem_Request(LSConstants.VARTYPE_CHECKPACKAGE,LSConstants.VARID_CHECKPACKAGE,0,0));
-		requestVariableMap.put(LSConstants.VARID_FLIP_STATE, new ReadItem_Request(LSConstants.VARTYPE_FLIP_STATE,LSConstants.VARID_FLIP_STATE,0,0));
-		requestVariableMap.put(LSConstants.VARID_JACKING_DISTANCE, new ReadItem_Request(LSConstants.VARTYPE_JACKING_DISTANCE,LSConstants.VARID_JACKING_DISTANCE,0,0));
-		requestVariableMap.put(LSConstants.VARID_BELT_ROTATION_STATE, new ReadItem_Request(LSConstants.VARTYPE_BELT_ROTATION_STATE,LSConstants.VARID_BELT_ROTATION_STATE,0,0));
-		requestVariableMap.put(LSConstants.VARID_OPERATION_STATE, new ReadItem_Request(LSConstants.VARTYPE_OPERATION_STATE,LSConstants.VARID_OPERATION_STATE,0,0));
-		requestVariableMap.put(LSConstants.VARID_BATTERYCAPACITY, new ReadItem_Request(LSConstants.VARTYPE_BATTERYCAPACITY,LSConstants.VARID_BATTERYCAPACITY,0,0));
-		
-	}
-	public RetrievalAGVInfoTask(long tSleep, Client client,List<Integer> varIDList) {
+	public RetrievalAGVInfoTask(long tSleep, Client client) {
 		super(tSleep);
 		this.client = client;
-		this.varIDList=varIDList;
 	}
 
 
@@ -46,15 +31,37 @@ public class RetrievalAGVInfoTask extends CyclicTask{
 				this.terminate();
 				return;
 			}
-			List<ReadItem_Request> readItemList= varIDList.stream().map((varid)->{return requestVariableMap.get(varid);}).collect(Collectors.toList());
-			ReadVariable<ReadItem_Request> readVariable = new ReadVariable<ReadItem_Request>(readItemList.size(),readItemList,ReadItem_Request.class);
-			byte[] data_byte=readVariable.toBytes();
-			PacketModel packetModel = new PacketModel();
-			packetModel.setPacketType(LSConstants.PACKET_TYPE_READVAR);
-			packetModel.setPacketSerialNo(PacketSerialNo.getSerialNo());
-			packetModel.setData_bytes(data_byte);
-			packetModel.setErrorCode(LSConstants.ERROR_CODE_SUCCESS);
-			client.sendMsgToServer(packetModel);
+			String command="0000";
+			/*// 读取平台状态
+			command="030E";
+			client.sendSimProToServer(command);
+			Thread.sleep(20);*/
+
+			// 读取当前位置
+			command="050E";
+			client.sendSimProToServer(command);
+			Thread.sleep(20);
+
+			// 读取X速度
+			command="0601";
+			client.sendSimProToServer(command);
+			Thread.sleep(20);
+
+			// 读取Y速度
+			command="0600";
+			client.sendSimProToServer(command);
+			Thread.sleep(20);
+
+			// 读取目标位置
+			/*command="090E";
+			client.sendSimProToServer(command);
+			Thread.sleep(80);*/
+
+			// 读取二维码
+			/*command="310E";
+			client.sendSimProToServer(command);
+			Thread.sleep(80);*/
+
 		} catch (Exception e) {
 			LOG.error("",e);
 		}
