@@ -135,46 +135,38 @@
 		// alert(screenWidth+"---"+screenHeight+"---"+leftOffset+"---"+topOffset);
 	}
 	/**
-	 *车辆坐标系转换，
-	 *因浏览器的坐标系是左上角为原点，所以要将小车的位置坐标转换一下，才能正常显示
-	 *p_left_bottom 的坐标作为原点
+	 *地图坐标系的坐标值 转换为 浏览器坐标系的坐标值
+	 * @description 因浏览器的坐标系是左上角为原点，而地图坐标系的原点在左下角，所以要将小车的位置坐标转换一下
+	 * p_left_bottom 地图原点在浏览器坐标系中的坐标值
+	 * @param coor 地图坐标系的坐标值
+	 * @return 浏览器坐标系中的坐标值
 	*/
-	
-	function transformMapXYToSVG(coor){
-		
+	function transformToBrowserCoor(coor){
 		var transformedCoor={};
 		transformedCoor.X=p_left_bottom.X+coor.X;
 		transformedCoor.Y=p_left_bottom.Y-coor.Y;
 		return transformedCoor;	
 	}
 	/**
-	 *将SVG坐标转换成地图坐标
+	 *浏览器坐标系的坐标值 转换为 地图坐标系的坐标值
+	 * @param coor 浏览器坐标系中的坐标值
+     * @return 地图坐标系的坐标值
 	*/
-	function transformSVGXYToMapXY (coor){
+	function transformToMapCoor (coor){
 		var transformedCoor={};
 		transformedCoor.X=coor.X;-p_left_bottom.X
 		transformedCoor.Y=p_left_bottom.Y-coor.Y;
 		return transformedCoor;	
 	}
 	
-	
-	/**
-	 *将浏览器坐标转换成SVG坐标
-	*/
-	function tranformBrowseXYToSVGXY(coor){
-		var transformedCoor={};
-		transformedCoor.X=coor.X;-p_left_bottom.X
-		transformedCoor.Y=p_left_bottom.Y-coor.Y;
-		return transformedCoor;	
-	}
 	/**
 	 *将小车传输来的真实坐标按比例转换为虚拟地图上的坐标，并转换坐标系
 	 */
-	function tranformReal_virtualXY(coor){
+	function tranformRealCoorToBrowserCoor(coor){
 		var transformedCoor={};
 		transformedCoor.X=real_virtual_rate*coor.X;
 		transformedCoor.Y=real_virtual_rate*coor.Y;
-		return transformMapXYToSVG(transformedCoor);	
+		return transformToBrowserCoor(transformedCoor);	
 	}
 	function makVehicle(vehicleIp){
 		var vihecleOffset=3;
@@ -184,10 +176,10 @@
 	}
 
 	function resetVehicle(){
-		vehicleMoveTo("vehicle-01",tranformReal_virtualXY({'X':0,'Y':0}));
+		vehicleMoveTo("vehicle-01",tranformRealCoorToBrowserCoor({'X':0,'Y':0}));
 	}
 	function updateVehiclePosition(vehicleId,coor){
-		vehicleMoveTo("vehicle-01",tranformReal_virtualXY(coor));
+		vehicleMoveTo("vehicle-01",tranformRealCoorToBrowserCoor(coor));
 	}
 	function vehicleMoveTo(vehicleId,coor){
 		$("#"+vehicleId).attr("x",coor.X).attr("y",coor.Y);
@@ -195,7 +187,7 @@
 	function onLineClick(event){
 		//var e = event || window.event;
 		//var browseXY={"X":e.screenX,"Y":e.screenY};
-		//var mapXY=transformSVGXYToMapXY(tranformBrowseXYToSVGXY(browseXY));
+		//var mapXY=transformToMapCoor(tranformBrowseXYToSVGXY(browseXY));
 		//alert(mapXY.X+"===="+mapXY.Y);
 		//alert(e.screenX+"----"+e.screenY);
 		
