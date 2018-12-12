@@ -184,7 +184,7 @@ public class Client {
 							LOG.info(result);
 							if(result.startsWith("Position")){// 读取当前位置
 								String xy=result.split("X:")[1];
-								xy=xy.replaceAll("\r\n","");
+//								xy=xy.replaceAll("\r\n","");
 								String x=xy.split("Y:")[0];
 								String y=xy.split("Y:")[1];
 								Coordinate coor = new Coordinate(Math.round(Double.valueOf(x)*100)/100.0,Math.round(Double.valueOf(y)*100)/100.0);
@@ -200,7 +200,7 @@ public class Client {
 							}
 							else if(result.startsWith("AGV Position")){
 								String xy=result.split("X:")[1];
-								xy=xy.replaceAll("\r\n","");
+//								xy=xy.replaceAll("\r\n","");
 								String x=xy.split("Y:")[0];
 								String y=xy.split("Y:")[1];
 								Coordinate coor = new Coordinate(Double.valueOf(x),Double.valueOf(y));
