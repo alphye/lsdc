@@ -1,12 +1,8 @@
 package com.lishengzn.util;
 
-import com.lishengzn.packet.PacketModel;
-import com.lishengzn.packet.PacketSerialNo;
-
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
 
 /*Nspd:[78, 115, 112, 100]*/
 public class SocketUtil {
@@ -35,16 +31,16 @@ public class SocketUtil {
 	public static int bytesToInt(byte[] bytes) {
 		int num = 0;
 		int temp;
-		temp = (0x000000ff & (bytes[0])) << 0;
+		temp = (0xff & (bytes[0])) << 0;
 		num = num | temp;
 
-		temp = (0x000000ff & (bytes[1])) << 8;
+		temp = (0xff & (bytes[1])) << 8;
 		num = num | temp;
 
-		temp = (0x000000ff & (bytes[2])) << 16;
+		temp = (0xff & (bytes[2])) << 16;
 		num = num | temp;
 
-		temp = (0x000000ff & (bytes[3])) << 24;
+		temp = (0xff & (bytes[3])) << 24;
 		num = num | temp;
 
 		return num;
@@ -283,152 +279,7 @@ public class SocketUtil {
 		return new byte[]{booleanToByte(b)};
 	}
 
-	/**将要发送的数据包装为带数据域包头的字节数组
-	 * @param packetModel
-	 * @return
-	 * @throws UnsupportedEncodingException
-	 */
-	private static byte[] prependDataHead(PacketModel packetModel)
-			throws UnsupportedEncodingException {
-		byte packetType_bytes[] = intToBytes(packetModel.getPacketType());
 
-		byte dataPacket_bytes[] = new byte[24 + packetModel.getData_bytes().length];
-
-		// 在数据域包0-3位放入包序号
-		int packetSeriaNo;
-		if(packetModel.getPacketSerialNo()!=-1){
-			packetSeriaNo=packetModel.getPacketSerialNo();
-		}else{
-			packetSeriaNo = PacketSerialNo.getSerialNo();
-		}
-		byte serialNo_bytes[] = intToBytes(packetSeriaNo);
-		System.arraycopy(serialNo_bytes, 0, dataPacket_bytes, 0, 4);
-
-		// 在数据域包4-7位放入包类型
-		System.arraycopy(packetType_bytes, 0, dataPacket_bytes, 4, 4);
-
-		// 在数据域包8-11位放入数据域长度
-		byte dataLength_bytes[] = intToBytes(packetModel.getData_bytes().length);
-		System.arraycopy(dataLength_bytes, 0, dataPacket_bytes, 8, 4);
-		// 数据所域包第12-15位放入错误代码
-		System.arraycopy(intToBytes(packetModel.getErrorCode()), 0, dataPacket_bytes, 12, 4);
-		// 数据所域包第16-23位放入保留位，不需要向数组做任何操作
-
-		// 至此数据域包中包头整理完毕，从第24位开始就是数据域
-		System.arraycopy(packetModel.getData_bytes(), 0, dataPacket_bytes, 24, packetModel.getData_bytes().length);
-
-		return dataPacket_bytes;
-
-	}
-
-	/**
-	 * 生成底层包头并拼接到前面
-	 * 
-	 * @param dataPacket_bytes
-	 * @return
-	 * @throws UnsupportedEncodingException
-	 */
-	private static byte[] prependBaseHead(byte[] dataPacket_bytes) throws UnsupportedEncodingException {
-		byte packet_bytes[] = new byte[8 + dataPacket_bytes.length];
-
-		// 第0-3位放固定值Nspd
-		System.arraycopy("Nspd".getBytes(), 0, packet_bytes, 0, 4);
-
-		// 第4-7位放包的总长度
-		System.arraycopy(intToBytes(dataPacket_bytes.length), 0, packet_bytes, 4, 4);
-
-		// 第8位开始，放数据域包
-		System.arraycopy(dataPacket_bytes, 0, packet_bytes, 8, dataPacket_bytes.length);
-
-		return packet_bytes;
-	}
-
-	/**打包数据
-	 * @param packetModel
-	 * @return
-	 * @throws UnsupportedEncodingException
-	 */
-	public static byte[] packetMessage(PacketModel packetModel)
-			throws UnsupportedEncodingException {
-		byte dataPacket_bytes[] = prependDataHead(packetModel);
-		byte packet_bytes[] = prependBaseHead(dataPacket_bytes);
-		return packet_bytes;
-	}
-
-	/**
-	 * 读取下一个数据包
-	 * 
-	 * @param in
-	 *            输入流
-	 * @return 从输入流解读出的下一个数据包
-	 * @throws IOException
-	 */
-	public static PacketModel readNextPacketData(InputStream in) throws IOException {
-		synchronized (in) {
-			// PacketModel packetModel = new PacketModel();
-			BufferedInputStream bis = new BufferedInputStream(in);
-			byte[] head = new byte[8];
-			while (bis.read(head) < 0)
-				;
-			// 底层包头，前4位，固定格式
-			String Nspd = new String(Arrays.copyOf(head, 4));
-			if (!"Nspd".equals(Nspd)) {
-				return null;
-			}
-			// 底层包头，4-7位，数据域包长度
-			byte packetLength_bytes[] = Arrays.copyOfRange(head, 4, 8);
-			int packetLength = bytesToInt(packetLength_bytes);
-			byte[] dataPacket_bytes = new byte[packetLength];
-			if (bis.read(dataPacket_bytes) < 0) {
-				return null;
-			}
-			return unPacketDataPacket(dataPacket_bytes);
-		}
-	}
-
-	/**
-	 * 解析数据域包
-	 * 
-	 * @param dataPacket_bytes
-	 * @return
-	 */
-	public static PacketModel unPacketDataPacket(byte[] dataPacket_bytes) {
-		PacketModel packetModel = new PacketModel();
-		// 数据域包，前4位 包序号
-		int packetSerialNo = bytesToInt(Arrays.copyOf(dataPacket_bytes, 4));
-		packetModel.setPacketSerialNo(packetSerialNo);
-
-		// 数据域包，4-7位，包类型
-		int packetType = bytesToInt(Arrays.copyOfRange(dataPacket_bytes, 4, 8));
-		packetModel.setPacketType(packetType);
-		// 数据域包 8-11位,数据域长度
-		int dataLength = bytesToInt(Arrays.copyOfRange(dataPacket_bytes, 8, 12));
-		// 数据所域包第12-15位，错误代码
-		int errorCode = bytesToInt(Arrays.copyOfRange(dataPacket_bytes, 12, 16));
-		packetModel.setErrorCode(errorCode);
-		if (dataPacket_bytes.length - dataLength != 24) {
-			throw new RuntimeException("报文长度校验异常！");
-		}
-		// 数据包，24之后都是数据域
-		byte data_bytes[] = Arrays.copyOfRange(dataPacket_bytes, 24, dataPacket_bytes.length);
-		packetModel.setData_bytes(data_bytes);
-		return packetModel;
-	}
-
-	/**发送 数据包
-	 * @param out
-	 * @param packetModel
-	 * @throws IOException
-	 */
-	public static void sendPacketData(OutputStream out, PacketModel packetModel)
-			throws IOException {
-		synchronized (out) {
-			byte[] sendBytes = SocketUtil.packetMessage(packetModel);
-			BufferedOutputStream bos = new BufferedOutputStream(out);
-			bos.write(sendBytes);
-			bos.flush();
-		}
-	}
 
 	/**
 	 * 根据包类型获取 应答包的报类型
@@ -444,23 +295,53 @@ public class SocketUtil {
 
 	public static void sendSimpleProtocol(OutputStream out, String command) throws IOException {
 		synchronized (out) {
-			byte[] sendBytes = hexToBytes(command);
+			Integer cmd =Integer.valueOf(command.substring(0,2));
+			Integer param =Integer.valueOf(command.substring(2));
+			byte b_cmd =(byte) (0xff & cmd);
+			byte b_param =(byte) (0xff & param);
+			byte[] sendBytes = new byte[]{b_cmd,b_param};
+
 			out.write(sendBytes);
 		}
 	}
 
 
 	public static String readLineSimpleProtocol(InputStream in) throws IOException {
-		String result="";
-		BufferedReader bf = new BufferedReader(new InputStreamReader(in));
-		result=bf.readLine();
-		return result;
+		synchronized (in){
+//			BufferedReader bf = new BufferedReader(new InputStreamReader(in));
+			StringBuilder sb = new StringBuilder();
+//			String result=bf.readLine();
+			byte[] b = new byte[1];
+			while(in.read(b)>0){
+				String str = new String(b,"UTF-8");
+				if("\r".equals(str)){
+					continue;
+				}
+				if("\n".equals(str)){
+					break;
+				}else{
+					sb.append(str);
+				}
+			}
+
+		/*	byte [] readBytes = new byte[10240];
+			BufferedInputStream bis = new BufferedInputStream(in);
+			while(bis.read(readBytes)<=0){
+			}
+			String str =new String(readBytes,"UTF-8");
+			if(str.indexOf("\r\n")>-1){
+			}*/
+				return sb.toString();
+		}
+
 	}
 	public static String readSimpleProtocol(InputStream in) throws IOException {
-		String result="";
-		byte[] bytes = new byte[2];
-		while (in.read(bytes)<=0){}
-		result=bytesToHex(bytes);
-		return result;
+		synchronized (in){
+			String result="";
+			byte[] bytes = new byte[2];
+			while (in.read(bytes)<=0){}
+			result=bytesToHex(bytes);
+			return result;
+		}
 	}
 }

@@ -5,9 +5,7 @@ import com.lishengzn.constant.TopicAddressConstants;
 import com.lishengzn.dto.CommandDto;
 import com.lishengzn.service.WebSocketMsgService;
 import com.lishengzn.socket.Client;
-import com.lishengzn.task.FullDispatchTask;
 import com.lishengzn.util.CacheManager;
-import com.lishengzn.util.ReadMapUtil;
 import com.lishengzn.websocket.WebSocketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,21 +46,20 @@ public class WebSocketMsgServiceImpl implements WebSocketMsgService {
         if(CacheManager.cache.get(CacheManager.clientPoolKey)==null){
             CacheManager.cache.put(CacheManager.clientPoolKey, new ConcurrentHashMap<String,Client>());
         }
-        ReadMapUtil.initialize();
         // 先把现有的小车都线
-        allVehiclesOffLine();
+        vehicleOffline();
         String[] ipArray = vehicleips.split(",");
         for(int i =0;i<ipArray.length;i++){
             String ip=ipArray[i].split(":")[0];
             int port=Integer.valueOf(ipArray[i].split(":")[1]);
             new Client(ip,port, this);
-//            threadPool.execute(new FullDispatchTask(Integer.valueOf(fullDispatchTask_tSleep),this));
             CommandDto command = new CommandDto(CommandDto.TYPE.setVehicleInIp.name(),ip);
             sendToAll(TopicAddressConstants.setVehicleInIp,JSONObject.toJSONString(command));
         }
     }
 
-    private void  allVehiclesOffLine(){
+    @Override
+    public void vehicleOffline(){
         Map<String,Client> map =(Map<String,Client>) CacheManager.cache.get(CacheManager.clientPoolKey);
         Set<Map.Entry<String,Client>> entrySet = map.entrySet();
         entrySet.forEach((e)->vehicleOffLine(e.getKey()));

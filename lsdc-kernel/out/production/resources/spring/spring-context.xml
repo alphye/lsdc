@@ -19,5 +19,4 @@
 		<context:exclude-filter expression='com.lishengzn.websocket.WebSocketService'  type='annotation' />
 	</context:component-scan>
 
-	<bean id="transportOrderPool" class="com.lishengzn.objectpool.TransportOrderPool" scope="singleton"></bean>
 </beans>

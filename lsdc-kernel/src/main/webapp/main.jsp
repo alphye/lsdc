@@ -111,7 +111,7 @@
     }
 
     function vehicleOnline(){
-        sendMessage(constantsJSON.stopicAddressConstants.verhicleOnline,"");
+        sendMessage(constantsJSON.stopicAddressConstants.vehicleOnline,"");
     }
 </script>
 </html>

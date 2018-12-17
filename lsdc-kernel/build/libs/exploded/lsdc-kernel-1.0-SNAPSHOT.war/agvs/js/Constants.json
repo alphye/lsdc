@@ -25,6 +25,7 @@ var constantsJSON =
     "startCharge":"/wbskt/startCharge",
     "packageSize":"/wbskt/packageSize",
     "clearError":"/wbskt/clearError",
-    "verhicleOnline":"/wbskt/verhicleOnline",
+    "vehicleOnline":"/wbskt/vehicleOnline",
+    "vehicleOffline":"/wbskt/vehicleOffline"
   }
 }

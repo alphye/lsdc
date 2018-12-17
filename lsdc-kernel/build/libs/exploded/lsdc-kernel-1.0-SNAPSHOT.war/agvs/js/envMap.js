@@ -23,12 +23,24 @@
 
 	$(function(){
 		initialize();
-		$("line").bind("click",onLineClick);
 		$("rect").bind("contextmenu",onRectContextMenu);
+        $(".cellIndex").bind("contextmenu",onRectContextMenu);
 		  $(document).click(function(){
 			$(".contextmenu").hide();
 		  });
 	});
+    function initialize(){
+        generateContextMenu2();
+        buildNnaviTaskTemplate();
+        // 真实地图的宽高比如果比屏幕的宽高比大，则要将<SVG>的width扩大。否则会显示不全
+        var n=realMapWidth/realMapHeight-screenWidth/screenHeight;
+        if(n>0){
+            $('#mainSVG').css('width',(100+Math.ceil(n*100))+'%');
+        }
+        makeMapWithJSON_withTrack();
+        makVehicle();
+        resetVehicle();
+    }
 	function onRectContextMenu(e){
         showContextMenu("contextmenu1",e);
         hidenContextMenu2();
@@ -66,7 +78,38 @@
         }).show();
         return false;
     }
+    function generateContextMenu2(){
+    	var template = $("#contextmenu2Template").val();
+        for(var i=0;i<actualTracks.length;i++){
+    		var index=actualTracks[i].index;
+    		var param=('0'+index).substr(-2);
+    		var html=template.replace("#param#",param).replace('#index#',index);
+    		$("#contextmenu2").append(html);
+		}
+	}
 
+	function buildNnaviTaskTemplate(){
+    	var naviTaskTemplate = $("#naviTaskTemplate").html();
+    	var options = "";
+        for(var i=0;i<actualTracks.length;i++){
+            var index=actualTracks[i].index;
+            var param='13'+('0'+index).substr(-2);
+            options=options+" <option value='"+param+"'>"+index+"号位置</option>";
+        }
+        naviTaskTemplate=naviTaskTemplate.replace("#options#",options);
+        $("#naviTaskTemplate").html(naviTaskTemplate);
+	}
+	function addNaviTask(){
+        var nextNaviTaskIndex = $("#nextNaviTaskIndex").val();
+        var naviTaskTemplate = $("#naviTaskTemplate").html();
+        var plussignShow = nextNaviTaskIndex == 0 ? "table-cell":"none";
+        naviTaskTemplate=naviTaskTemplate.replace("#plussignShow#",plussignShow);
+        naviTaskTemplate=naviTaskTemplate.replace(/#index#/g,nextNaviTaskIndex);
+        naviTaskTemplate=naviTaskTemplate.replace("#vehicleIp#",window.parent.vehicleIp)
+        $("#naviTaskDataArea").append(naviTaskTemplate);
+
+        $("#nextNaviTaskIndex").val(++nextNaviTaskIndex);
+	}
     function selectNaviPoints(e,th){
         $("#contextmenu3").hide();
         var winWidth = $(document).width();
@@ -136,79 +179,14 @@
         $("#contextmenu2").hide();
         $("#contextmenu3").hide();
     }
-	function initialize(){
-		// 真实地图的宽高比如果比屏幕的宽高比大，则要将<SVG>的width扩大。否则会显示不全
-		var n=realMapWidth/realMapHeight-screenWidth/screenHeight;
-		if(n>0){
-			$('#mainSVG').css('width',(100+Math.ceil(n*100))+'%');
-		}
-		makeMapWithJSON_withTrack();
-		//makeMap2();
-		makVehicle();
-		resetVehicle();
-	}
+
 	function makeSVG(tag, attrs) {
 		var el= document.createElementNS('http://www.w3.org/2000/svg', tag);
 		for (var k in attrs)
 			el.setAttribute(k, attrs[k]);
 		return el;
 	}
-	function makeMap() {
-			
-			for(var i=0;i<x_lineNum;i++){
-				// 画横线
-				for(var j=0;j<y_lineNum-1;j++){
-					var p_left={"X":p_left_top.X+j*gridWD,"Y":p_left_top.Y+i*gridHT};
-					var p_right={"X":p_left_top.X+(j+1)*gridWD,"Y":p_left_top.Y+i*gridHT};
-					var line=makeSVG("line",{x1:p_left.X,y1:p_left.Y,x2:p_right.X,y2:p_right.Y});
-					$("#mainSVG").append(line);
-				}
-				/*var p_left={"X":p_left_top.X,"Y":p_left_top.Y+i*gridHT};
-				var p_right={"X":p_right_top.X,"Y":p_right_top.Y+i*gridHT};
-				var line=makeSVG("line",{x1:p_left.X,y1:p_left.Y,x2:p_right.X,y2:p_right.Y});
-				$("#mainSVG").append(line);
-				*/
-			}
-			for(var i=0;i<y_lineNum;i++){
-				
-				// 画竖线
-				for(var j=0;j<y_lineNum-1;j++){
-					var p_left={"X":p_left_top.X+i*gridWD,"Y":p_left_top.Y+j*gridHT};
-					var p_right={"X":p_left_top.X+i*gridWD,"Y":p_left_top.Y+(j+1)*gridHT};
-					var line=makeSVG("line",{x1:p_left.X,y1:p_left.Y,x2:p_right.X,y2:p_right.Y});
-					$("#mainSVG").append(line);
-				}
-				/*p_left={"X":p_left_top.X+i*gridWD,"Y":p_left_top.Y};
-				p_right={"X":p_left_bottom.X+i*gridWD,"Y":p_left_bottom.Y};
-				var line=makeSVG("line",{x1:p_left.X,y1:p_left.Y,x2:p_right.X,y2:p_right.Y});
-				$("#mainSVG").append(line);
-				*/
-			}
-			// alert(screenWidth+"---"+screenHeight+"---"+leftOffset+"---"+topOffset);
-		}
-	function makeMap2() {
-		
-		for(var i=0;i<x_lineNum;i++){
-			// 画横线
-			
-			var p_left={"X":p_left_top.X,"Y":p_left_top.Y+i*gridHT};
-			var p_right={"X":p_right_top.X,"Y":p_right_top.Y+i*gridHT};
-			var line=makeSVG("line",{x1:p_left.X,y1:p_left.Y,x2:p_right.X,y2:p_right.Y});
-			$("#mainSVG").append(line);
-			
-		}
-		for(var i=0;i<y_lineNum;i++){
-			
-			// 画竖线
-			
-			p_left={"X":p_left_top.X+i*gridWD,"Y":p_left_top.Y};
-			p_right={"X":p_left_bottom.X+i*gridWD,"Y":p_left_bottom.Y};
-			var line=makeSVG("line",{x1:p_left.X,y1:p_left.Y,x2:p_right.X,y2:p_right.Y});
-			$("#mainSVG").append(line);
-			
-		}
-		// alert(screenWidth+"---"+screenHeight+"---"+leftOffset+"---"+topOffset);
-	}
+
 	/**
 	 *地图坐标系的坐标值 转换为 浏览器坐标系的坐标值
 	 * @description 因浏览器的坐标系是左上角为原点，而地图坐标系的原点在左下角，所以要将小车的位置坐标转换一下
@@ -247,7 +225,7 @@
 		var vihecleOffset=3;
 		var vihecleLength=gridWD-vihecleOffset;
 		var vehicle=makeSVG('rect',{x:0,y:0,width:vihecleLength,height:vihecleLength,id:'vehicle-01',style:"stroke: blue; fill: red;",transform:"translate("+(-vihecleLength/2)+","+(-vihecleLength/2)+")"});
-		$("#mainSVG").append(vehicle);
+		$("#g1").append(vehicle);
 	}
 
 	function resetVehicle(){
@@ -259,37 +237,8 @@
 	function vehicleMoveTo(vehicleId,coor){
 		$("#"+vehicleId).attr("x",coor.X).attr("y",coor.Y);
 	}
-	function onLineClick(event){
-		//var e = event || window.event;
-		//var browseXY={"X":e.screenX,"Y":e.screenY};
-		//var mapXY=transformToMapCoor(tranformBrowseXYToSVGXY(browseXY));
-		//alert(mapXY.X+"===="+mapXY.Y);
-		//alert(e.screenX+"----"+e.screenY);
-		
-		/*var range = document.getElementById("p_lt").getBoundingClientRect();
-		var range2 = document.getElementById("p_lt").getBBox();
-		var rect = range.getBoundingClientRect();
-		var x = rect.left, y = box.top;*/
-	}	
-	function onSendToPoint(){
-		var coorStr = prompt("请输入终点坐标","0,0");
-        if(coorStr){
-			var coor ={"X":coorStr.split(",")[0],"Y":coorStr.split(",")[1]};
-			 window.parent.moveToPoint(coor);
-         }
-	}
-	
-	function onChangeContainerDirection(){
-		var direction = prompt("请输入货柜最终朝向,1-向前，2-向右","1");
-		if(direction){
-			if(isNaN(direction) || (direction!=1&& direction !=2)){
-				alert("请输入数字1或2");
-				return;
-			}
-			window.parent.changeContainerDirection(direction);
-		}
-	}
-	
+
+
 	function onStopCharge(){
 		window.parent.stopCharge();
 	}
@@ -299,14 +248,6 @@
 	
 	function onQueryNaviTrails(){
 		window.parent.queryNaviTrails();
-	}
-	function onWritePackageSize(){
-		var size = prompt("请输入包裹尺寸","100.0,100.0");
-		 if(size){
-			var packageSize ={"packageLength":size.split(",")[0],"packageWidth":size.split(",")[1]};
-			window.parent.writePackageSize(packageSize);
-         }
-		
 	}
 
 	function vehicleOnline(){
@@ -330,3 +271,86 @@
     function sendSimProCmd(param) {
         window.parent.sendSimProCmd(param);
     }
+
+    function createNaviTask(){
+        $("#createNaviTaskBox").fadeIn("slow");
+        addNaviTask();
+	}
+	function cancleDialog() {
+		$("#naviTaskDataArea").html("");
+		$("#nextNaviTaskIndex").val("0");
+		$("#createNaviTaskBox").fadeOut("fast");
+		// $("#mask").css({ display: 'none' });
+	}
+	
+	function submitDialog() {
+        var t = $('form').serializeArray();
+        var cyclicExecute = $("#cyclicExecute").prop("checked");
+        var url="/lsdc/simpPro/sendContinuousSimpProCmd";
+        if(cyclicExecute){
+            url="/lsdc/simpPro/sendCyclicContinuousSimpProCmd";
+        }
+		$.ajax({
+            url:url,
+            type:"post",
+            data:t,
+            success:function(result){
+                if(result.exception){
+                    alert("新建导航任务异常！");
+                }
+                cancleDialog();
+            }
+        });
+    }
+
+    function cancleCyclicTask(){
+        var url="/lsdc/simpPro/cancleCyclicTask";
+        var data={"vehicleIp":window.parent.vehicleIp};
+        $.ajax({
+            url:url,
+            type:"post",
+            contentType:"application/json;charset=UTF-8",
+            data:JSON.stringify(data),
+            success:function(result){
+                if(result.exception){
+                    alert("取消循环任务异常！");
+                }
+                if(result=="success"){
+                    alert("取消循环任务成功！");
+                }
+            }
+        });
+    }
+
+    $.fn.AFserializeObject = function() {
+        var obj = {};
+        var array = $("form").serializeArray();
+        $.each(array, function () {
+            var match = this.name.match(/^([^\s]+)\[(\d+)\]([^\s]*)$/);
+            if(match){// 有数组表达式[number]
+                var arrayName=RegExp.$1;
+                if(!obj[arrayName]){
+                    obj[arrayName]=[];
+                }
+                if(RegExp.$3){ // 如果数组后边有属性
+                    var arrName = ""+RegExp.$3.replace(".","");
+                    if(!obj[arrayName][RegExp.$2]){
+                        obj[arrayName][RegExp.$2]={};
+                    }
+                    obj[arrayName][RegExp.$2][arrName]=this.value;
+                }else{
+                    obj[arrayName][RegExp.$2]=this.value;
+                }
+            }else{
+                if (obj[this.name]) {
+                    if (!obj[this.name].push) {
+                        obj[this.name] = [ obj[this.name] ];
+                    }
+                    obj[this.name].push(this.value || '');
+                } else {
+                    obj[this.name] = this.value || '';
+                }
+            }
+        });
+        return obj;
+    };

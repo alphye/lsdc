@@ -1,53 +1,28 @@
-    var subscripeTopic = function() {
+var vehicleIp="";
+var subscripeTopic = function() {
         console.log("========subscripeTopic");
 		window.top.stomp.subscribe(constantsJSON.rtopicAddressConstants.setVehicleInIp,function(msg){
             var data =  JSON.parse(msg.body);
             $("#vehicleIp").html(data.message);
+            vehicleIp=data.message;
             alert("车辆上线："+data.message);
 		});
 		window.top.stomp.subscribe(constantsJSON.rtopicAddressConstants.setVehicleInfo,function(msg){
             var data =  JSON.parse(msg.body);
             var message = data.message;
             $("#vehicleIp").html(message.vehicleIp);
-            $("#vehicle_position").html(message.position.position_x + ","+ message.position.position_y);
+            vehicleIp=message.vehicleIp;
+            $("#vehicle_position").html(message.position.position_x + " , "+ message.position.position_y);
             if(message.targetPosition){
-                $("#vehicle_targetPosition").html(message.targetPosition.position_x + ","+ message.targetPosition.position_y);
+                $("#vehicle_targetPosition").html(message.targetPosition.position_x + " , "+ message.targetPosition.position_y);
             }
             // 更新小车位置
             SVGFrame.updateVehiclePosition("vehicle-01",{'X':message.position.position_x,'Y':message.position.position_y});
             $("#vehicle_vx").html(message.velocity_x);
             $("#vehicle_vy").html(message.velocity_y);
             $("#vehicle_batteryCapacity").html(message.batteryCapacity);
-            /*$("#vehicle_naviState").html(message.naviStateName);
-            var millisecond= new Date().getTime();
-
-            var t=(millisecond/10000.0 - Math.floor(millisecond/10000));
-            if(Math.round(t*10000)%500<=40){
-                // 这里是为了视觉效果，将“总里程”的更新频率降低到每1秒更新一次
-                $("#vehicle_mileage").html(message.mileage);
-            }*/
 		});
 
-		/*window.top.stomp.subscribe(constantsJSON.rtopicAddressConstants.setVehicleNaviState,function(msg){
-			var data =  JSON.parse(msg.body);
-			var message = data.message;
-			// 更新小车导航状态
-			$("#vehicle_naviState").html(message.naviStateName);
-		});
-
-		window.top.stomp.subscribe(constantsJSON.rtopicAddressConstants.setVehicleOperationState,function(msg){
-			var data =  JSON.parse(msg.body);
-			var message = data.message;
-            // 更新小车操作状态
-            $("#vehicle_operationState").html(message.operationStateName);
-		});
-
-		window.top.stomp.subscribe(constantsJSON.rtopicAddressConstants.printNaviTrails,function(msg){
-			var data =  JSON.parse(msg.body);
-			var message = data.message;
-            // 打印导航轨迹
-            console.log("本次导航轨迹：  "+message);
-		});*/
 
 		window.top.stomp.subscribe(constantsJSON.rtopicAddressConstants.error,function(msg){
 			var data =  JSON.parse(msg.body);
@@ -169,6 +144,14 @@
         var command={"commandType":"sendSimProCmd","message":{"vehicleIp":$("#vehicleIp").html(),"param":param}};
         send("/wbskt/sendSimpProCmd",JSON.stringify(command));
 	}
+	function sendContinousSimProCmd(tasks){
+        send("/wbskt/sendContinousSimProCmd",JSON.stringify(tasks));
+        // var command={"commandType":op,"message":{"vehicleIp":$("#vehicleIp").html()}};
+	}
     function vehicleOnline(){
-        window.top.vehicleOnline();
+        window.top.sendMessage(constantsJSON.stopicAddressConstants.vehicleOnline,"");
     }
+    function vehicleOffline(){
+        window.top.sendMessage(constantsJSON.stopicAddressConstants.vehicleOffline,"");
+        $("#vehicleIp").html("");
+	}

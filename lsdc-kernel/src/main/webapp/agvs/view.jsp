@@ -49,7 +49,6 @@ body {
 	float: left;
 	padding: 2px;
     background: #a76060;
-	/**background: url(imgs/192.png);**/
     border: 2px solid #774259;
 }
 .lable {
@@ -171,51 +170,27 @@ iframe{
 						</tr>
 						<tr class='outlinedA'>
 							<td class="lable">当前位置：</td>
-							<td class="cnt" id="vehicle_position">0,0</td>
+							<td class="cnt" id="vehicle_position">0 , 0</td>
 						</tr>
                         <tr class='outlinedA'>
                             <td class="lable">目标位置：</td>
-                            <td class="cnt" id="vehicle_targetPosition">0,0</td>
+                            <td class="cnt" id="vehicle_targetPosition">0 , 0</td>
                         </tr>
-						<%--<tr class='distant-top'>
-							<td class="lable">导航状态：</td>
-							<td class="cnt"  id="vehicle_naviState"></td>
-						</tr>
-						
-						<tr class='distant-top'>
-							<td class="lable">操作状态：</td>
-							<td class="cnt"  id="vehicle_operationState"></td>
-						</tr>--%>
-						
+
 						<tr class="outlinedB">
-							<td class="lable">X方向速度：</td>
+							<td class="lable">行驶速度-X：</td>
 							<td class="cnt" ><span id="vehicle_vx">0</span> mm/s</td>
 						</tr>
 
 						<tr class="outlinedB">
-							<td class="lable">Y方向速度：</td>
+							<td class="lable">行驶速度-Y：</td>
 							<td class="cnt" ><span id="vehicle_vy">0</span> mm/s</td>
 						</tr>
-						
-					<%--	<tr class="hsl">
-							<td class="lable">总里程数：</td>
-							<td class="cnt" ><span id="vehicle_mileage">0</span> mm</td>
-						</tr>--%>
 						
 						<tr class="distant-front">
 							<td class="lable">电池电量：</td>
 							<td class="cnt"><span id="vehicle_batteryCapacity">0</span> Ah</td>
 						</tr>
-						<tr style="display:none">
-							<td class="label" >
-								<input id="p_x"/>
-								<input id="p_y"/>
-							</td>
-							<td class="cnt" >
-								<button onclick="uppstn();"> updateVehiclePosition</button>
-							</td>
-						</tr>
-					
 					</table>
 					
 				</div>
@@ -304,17 +279,17 @@ iframe{
                         <tr>
                             <td><a onclick="sendSimProCmd('1001');" class="blue button">软件急停</a></td>
                             <td><a onclick="sendSimProCmd('1000');" class="blue button">清除急停</a></td>
-                            <td><a onclick="sendSimProCmd('330E');" class="blue button">启动转台</a></td>
+                            <td><a onclick="sendSimProCmd('3300');" class="blue button">启动转台</a></td>
                         </tr>
                         <tr>
                             <td><a onclick="sendSimProCmd('3501');" class="blue button">滚筒正转</a></td>
                             <td><a onclick="sendSimProCmd('3601');" class="blue button">滚筒反转</a></td>
-                            <td><a onclick="sendSimProCmd('3600');" class="blue button">滚筒停止</a></td>
+                            <td><a onclick="sendSimProCmd('3500');sendSimProCmd('3600');" class="blue button">滚筒停止</a></td>
                         </tr>
                         <tr>
                             <td><a onclick="sendSimProCmd('3701');" class="blue button">开启充电</a></td>
                             <td><a onclick="sendSimProCmd('3700');" class="blue button">停止充电</a></td>
-                            <td><a onclick="sendSimProCmd('320E');" class="blue button">车辆重启</a></td>
+                            <td><a onclick="vehicleOffline();" class="blue button">车辆下线</a></td>
                         </tr>
                         </tbody>
                     </table>

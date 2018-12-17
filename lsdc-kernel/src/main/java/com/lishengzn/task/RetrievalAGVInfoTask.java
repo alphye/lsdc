@@ -1,19 +1,8 @@
 package com.lishengzn.task;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import com.lishengzn.socket.Client;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.lishengzn.entity.read.ReadItem_Request;
-import com.lishengzn.entity.read.ReadVariable;
-import com.lishengzn.packet.PacketModel;
-import com.lishengzn.packet.PacketSerialNo;
-import com.lishengzn.socket.Client;
-import com.lishengzn.util.LSConstants;
 
 public class RetrievalAGVInfoTask extends CyclicTask{
 	private static final Logger LOG=LoggerFactory.getLogger(RetrievalAGVInfoTask.class);
@@ -38,19 +27,19 @@ public class RetrievalAGVInfoTask extends CyclicTask{
 			Thread.sleep(20);*/
 
 			// 读取当前位置
-			command="050E";
+			command="0800";
 			client.sendSimProToServer(command);
-			Thread.sleep(20);
+			Thread.sleep(30);
 
 			// 读取X速度
 			command="0601";
 			client.sendSimProToServer(command);
-			Thread.sleep(20);
+			Thread.sleep(30);
 
 			// 读取Y速度
 			command="0600";
 			client.sendSimProToServer(command);
-			Thread.sleep(20);
+//			Thread.sleep(30);
 
 			// 读取目标位置
 			/*command="090E";

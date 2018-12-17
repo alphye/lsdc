@@ -1,6 +1,5 @@
 package com.lishengzn.entity;
 
-import com.lishengzn.entity.order.TransportOrder;
 
 import java.io.Serializable;
 
@@ -12,10 +11,6 @@ public class Vehicle implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	private String vehicleIp;
-	/**
-	 * 小车在执行的任务
-	 */
-	private TransportOrder transportOrder;
 	/**
 	 * 车辆位置
 	 */
@@ -177,12 +172,6 @@ public class Vehicle implements Serializable{
 	
 
 	
-	public TransportOrder getTransportOrder() {
-		return transportOrder;
-	}
-	public void setTransportOrder(TransportOrder transportOrder) {
-		this.transportOrder = transportOrder;
-	}
 	public String getVehicleIp() {
 		return vehicleIp;
 	}
@@ -392,7 +381,7 @@ public class Vehicle implements Serializable{
 	}
 	@Override
 	public String toString() {
-		return "Vehicle [vehicleIp=" + vehicleIp + ", transportOrder=" + transportOrder + ", position=" + position
+		return "Vehicle [vehicleIp=" + vehicleIp +  ", position=" + position
 				+ ", velocity_x=" + velocity_x + ", velocity_y=" + velocity_y + ", velocity=" + velocity
 				+ ", angularVelocity=" + angularVelocity + ", acceleration=" + acceleration + ", angle=" + angle
 				+ ", pathId=" + pathId + ", naviState=" + naviState + ", naviStateName=" + naviStateName

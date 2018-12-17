@@ -1,15 +1,20 @@
 package com.lishengzn.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.lishengzn.dto.SimContinousTask;
+import com.lishengzn.dto.SimContinousTasks;
 import com.lishengzn.dto.UserDto;
 import com.lishengzn.websocket.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Map;
 import java.util.UUID;
 
 @Controller
@@ -30,7 +35,6 @@ public class LoginController {
         userDto.setAccountID(accountID);
         session.setAttribute(Constants.SKEY_ACCOUNT_ID, accountID);
         session.setAttribute("user",userDto);
-
         return "/main.jsp";
     }
 }

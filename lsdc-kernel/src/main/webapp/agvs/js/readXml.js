@@ -11,16 +11,16 @@ function makeMapWithJSON(){
 		
 		var line=makeSVG("line",{x1:p_start.X,y1:p_start.Y,x2:p_end.X,y2:p_end.Y,id:edge.id,class:"edge"});
 		
-		$("#mainSVG").append(line);
+		$("#g1").append(line);
 		if(startNodeCoor.position_y==0.0){
 			var text1 =makeSVG("text",{x:p_start.X-10,y:p_start.Y+10});
 			$(text1).text(Math.round(startNodeCoor.position_x));
-			$("#mainSVG").append(text1);
+			$("#g1").append(text1);
 		}
 		else if(startNodeCoor.position_x==0.0){
 			var text1 =makeSVG("text",{x:p_start.X-30,y:p_start.Y+5});
 			$(text1).text(Math.round(startNodeCoor.position_y));
-			$("#mainSVG").append(text1);
+			$("#g1").append(text1);
 		}
 	}
 }
@@ -37,35 +37,52 @@ function makeMapWithJSON_withTrack(){
 		
 		var line=makeSVG("line",{x1:p_start.X,y1:p_start.Y,x2:p_end.X,y2:p_end.Y,id:edge.id,class:"edge"});
 		
-		$("#mainSVG").append(line);
+		$("#g1").append(line);
 		if(startNodeCoor.position_y==minCoorXY){
 			var text1 =makeSVG("text",{x:p_start.X-10,y:p_start.Y+10+gridWD/2});
 			$(text1).text(Math.round(startNodeCoor.position_x));
-			$("#mainSVG").append(text1);
+			$("#g1").append(text1);
 		}
 		if(startNodeCoor.position_x==minCoorXY){
 			var text1 =makeSVG("text",{x:p_start.X-30-gridWD/2,y:p_start.Y+5});
 			$(text1).text(Math.round(startNodeCoor.position_y));
-			$("#mainSVG").append(text1);
+			$("#g1").append(text1);
 		}
-		
-		// 画轨道
-		/*if(p_start.Y==p_end.Y){
-			// 针对每一条横边，以它的终点为中心，画一个轨道格子
-			var trackCell=makeSVG('rect',{x:p_end.X,y:p_end.Y,width:gridWD,height:gridWD,class:'trackCell',transform:"translate("+(-gridWD/2)+","+(-gridWD/2)+")"});
-			$("#mainSVG").append(trackCell);
-			if(startNodeCoor.position_x==minCoorXY){
-				// 如果是最左侧的横边，则要再以它的起点为中心，画一个轨道格子
-				trackCell=makeSVG('rect',{x:p_start.X,y:p_start.Y,width:gridWD,height:gridWD,class:'trackCell',transform:"translate("+(-gridWD/2)+","+(-gridWD/2)+")"});
-				$("#mainSVG").append(trackCell);
-			}
-		}*/
 	}
     // 画轨道
+    var trackCellArr=[];
 	for(var i=0;i<nodes.length;i++){
 		var node = nodes[i];
 		var trackCoor=tranformRealCoorToBrowserCoor({"X":node.position.position_x,"Y":node.position.position_y});
-        var trackCell=makeSVG('rect',{x:trackCoor.X,y:trackCoor.Y,width:gridWD,height:gridWD,class:'trackCell',transform:"translate("+(-gridWD/2)+","+(-gridWD/2)+")"});
-        $("#mainSVG").append(trackCell);
+		var clazz="trackCell";
+        var trackCell;
+        if(isActualTrack(node)){
+            clazz="actualTrackCell";
+            trackCell=makeSVG('rect',{index:node.index,x:trackCoor.X,y:trackCoor.Y,width:gridWD,height:gridWD,class:clazz,transform:"translate("+(-gridWD/2)+","+(-gridWD/2)+")"});
+            trackCellArr.push(trackCell);
+            continue;
+        }
+        trackCell=makeSVG('rect',{x:trackCoor.X,y:trackCoor.Y,width:gridWD,height:gridWD,class:clazz,transform:"translate("+(-gridWD/2)+","+(-gridWD/2)+")"});
+        $("#g1").append(trackCell);
 	}
+
+	for(var i=0;i<trackCellArr.length;i++){
+        $("#g1").append(trackCellArr[i]);
+        var text2 =makeSVG("text",{x:$(trackCellArr[i]).attr("x")-5 ,y:$(trackCellArr[i]).attr("y"),class:"cellIndex"});
+        $(text2).text($(trackCellArr[i]).attr("index"));
+        // 轨道的index放在g2，就会显示是在上层，不会被车遮盖住
+        $("#g2").append(text2);
+    }
+}
+
+function isActualTrack(node){
+    for(var i=0;i<actualTracks.length;i++){
+        var actualTrack = actualTracks[i];
+        if(Math.abs(actualTrack.position.X-node.position.position_x)<=250 && Math.abs(actualTrack.position.Y-node.position.position_y)<=250){
+            console.log("actualTrack===="+node);
+            node.index=actualTrack.index;
+            return true;
+        }
+    }
+    return false;
 }
