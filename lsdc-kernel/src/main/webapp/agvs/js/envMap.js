@@ -137,6 +137,8 @@
             posTop = posY + secMargin + "px";
         };
         $("#contextmenu2").css({
+			"height":$("#contextmenu1").height(),
+			"overflow":"auto",
             "left": posLeft,
             "top": posTop
         }).show();
