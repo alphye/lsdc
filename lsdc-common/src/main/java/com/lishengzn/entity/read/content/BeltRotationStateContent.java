@@ -1,14 +1,19 @@
 package com.lishengzn.entity.read.content;
 
+import com.google.common.primitives.Bytes;
 import com.lishengzn.util.SocketUtil;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**提供皮带转动状态
  * @author Administrator
  *
  */
 public class BeltRotationStateContent extends VariableContent {
+
+	private long operationId;
 	/**
 	 * 皮带转动状态
 	 */
@@ -17,9 +22,18 @@ public class BeltRotationStateContent extends VariableContent {
 	public BeltRotationStateContent() {
 	}
 
-	public BeltRotationStateContent(int beltRotationState) {
+	public BeltRotationStateContent(long operationId,int beltRotationState) {
 		super();
+		this.operationId=operationId;
 		this.beltRotationState = beltRotationState;
+	}
+
+	public long getOperationId() {
+		return operationId;
+	}
+
+	public void setOperationId(long operationId) {
+		this.operationId = operationId;
 	}
 
 	public int getBeltRotationState() {
@@ -32,44 +46,19 @@ public class BeltRotationStateContent extends VariableContent {
 
 	@Override
 	public byte[] toBytes() {
-		byte[] beltRotationState_byte = SocketUtil.intToBytes(beltRotationState);
-
-		byte[] subVar_bytes = new byte[beltRotationState_byte.length];
-		System.arraycopy(beltRotationState_byte, 0, subVar_bytes, 0, beltRotationState_byte.length);
-
-		return subVar_bytes;
+		List<Byte> byteList=new ArrayList<Byte>();
+		byteList.addAll(Bytes.asList(SocketUtil.longToBytes(operationId)));
+		byteList.addAll(Bytes.asList(SocketUtil.intToBytes(beltRotationState)));
+		return Bytes.toArray(byteList);
 	}
 
 	@Override
 	public BeltRotationStateContent fromBytes(byte[] subVar_bytes) {
-		if (subVar_bytes.length != 4) {
-			throw new RuntimeException("“提供皮带转动状态”变量内容字节数须为4");
+		if (subVar_bytes.length != 12) {
+			throw new RuntimeException("“提供皮带转动状态”变量内容字节数须为12");
 		}
-		this.setBeltRotationState(SocketUtil.bytesToInt(Arrays.copyOfRange(subVar_bytes, 0, 4)));
+		this.setOperationId(SocketUtil.bytesToLong(Arrays.copyOfRange(subVar_bytes, 0, 8)));
+		this.setBeltRotationState(SocketUtil.bytesToInt(Arrays.copyOfRange(subVar_bytes, 8, 12)));
 		return this;
-	}
-
-	public enum State{
-		/**
-		 * 正在转动 1
-		 */
-		ROTATING(1,"正在转动"),
-		/**
-		 * 停止转动 0
-		 */ 
-		STOPPED(0,"停止转动");
-		private int value;
-		private String description;
-		private State(int value, String description) {
-			this.value = value;
-			this.description = description;
-		}
-		public int getValue() {
-			return value;
-		}
-		public String getDescription() {
-			return description;
-		}
-		
 	}
 }

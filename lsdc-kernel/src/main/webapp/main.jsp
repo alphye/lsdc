@@ -19,6 +19,7 @@
 <div id="navi"  style="width:99.5%;height:5%;">
     <span style="display: none;">${accountId}</span>
     <button onclick="vehicleOnline();">车辆上线</button>
+    <button onclick="vehicleOffline();">车辆下线</button>
 </div>
 <div id="content" style="width:99.5%;height:95%;">
     <iframe name="viewFrame" width="100%" height="100%" src="${pageContext.request.contextPath}/agvs/view.jsp"></iframe>
@@ -109,7 +110,10 @@
     }
 
     function vehicleOnline(){
-        sendMessage(constantsJSON.stopicAddressConstants.verhicleOnline,"");
+        sendMessage(constantsJSON.stopicAddressConstants.vehicleOnline,"");
+    }
+    function vehicleOffline(){
+        sendMessage(constantsJSON.stopicAddressConstants.vehicleOffline,"");
     }
 </script>
 </html>

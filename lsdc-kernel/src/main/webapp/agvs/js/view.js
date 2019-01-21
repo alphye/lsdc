@@ -7,6 +7,7 @@
 		window.top.stomp.subscribe(constantsJSON.rtopicAddressConstants.setVehicleInfo,function(msg){
             var data =  JSON.parse(msg.body);
             var message = data.message;
+            $("#vehicleIp").val(message.vehicleIp);
             $("#vehicle_position").html(message.position.position_x + ","+ message.position.position_y);
             // 更新小车位置
             SVGFrame.updateVehiclePosition("vehicle-01",{'X':message.position.position_x,'Y':message.position.position_y});
@@ -60,6 +61,7 @@
 	function send(address,message) {
 		window.top.sendMessage(address,message);
 	}
+
 	function move(op){
 		if(!/^[1-9][0-9]*$/.test($("#moveCells").val())){
 			alert("请输入正整数！");

@@ -50,7 +50,12 @@ public class WebSocketMsgServiceImpl implements WebSocketMsgService {
         }
         ReadMapUtil.initialize();
         // 先把现有的小车都线
-        allVehiclesOffLine();
+        vehicleOffline();
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         String[] ipArray = vehicleips.split(",");
         for(int i =0;i<ipArray.length;i++){
             String ip=ipArray[i].split(":")[0];
@@ -62,10 +67,12 @@ public class WebSocketMsgServiceImpl implements WebSocketMsgService {
         }
     }
 
-    private void  allVehiclesOffLine(){
+    @Override
+    public void  vehicleOffline(){
         Map<String,Client> map =(Map<String,Client>) CacheManager.cache.get(CacheManager.clientPoolKey);
         Set<Map.Entry<String,Client>> entrySet = map.entrySet();
         entrySet.forEach((e)->vehicleOffLine(e.getKey()));
+        System.gc();
     }
 
     private void vehicleOffLine(String ip){

@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import com.lishengzn.constant.TopicAddressConstants;
+import com.lishengzn.entity.read.content.*;
 import com.lishengzn.service.WebSocketMsgService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,16 +33,6 @@ import com.lishengzn.entity.operation.SendOperationTask;
 import com.lishengzn.entity.order.TransportOrder;
 import com.lishengzn.entity.read.ReadItem_Response;
 import com.lishengzn.entity.read.ReadVariable;
-import com.lishengzn.entity.read.content.BatteryCapacityContent;
-import com.lishengzn.entity.read.content.BeltRotationStateContent;
-import com.lishengzn.entity.read.content.ChargeStateContent;
-import com.lishengzn.entity.read.content.CheckPackageContent;
-import com.lishengzn.entity.read.content.FlipStateContent;
-import com.lishengzn.entity.read.content.JackingDistanceContent;
-import com.lishengzn.entity.read.content.OperationStateContent;
-import com.lishengzn.entity.read.content.PositionContent;
-import com.lishengzn.entity.read.content.UpdateStateContent;
-import com.lishengzn.entity.read.content.VelocityContent;
 import com.lishengzn.entity.write.ControlChargeContent;
 import com.lishengzn.entity.write.PackageSize;
 import com.lishengzn.entity.write.WriteItem;
@@ -85,8 +76,9 @@ public class Client {
 			LOG.error("",e);
 			throw new SimpleException("无法连接到车辆，请确认车辆已开启！");
 		}
-		this.vehicle=new Vehicle();
+		this.vehicle=new Vehicle(new Coordinate(0,0));
 		vehicle.setNaviState(NaviStateEnum.IDLE.getValue());
+		vehicle.setVehicleIp(ip);
 		listen2Server();
 		if(CacheManager.cache.get(CacheManager.clientPoolKey)==null){
 			CacheManager.cache.put(CacheManager.clientPoolKey, new ConcurrentHashMap<String,Client>());
@@ -99,7 +91,7 @@ public class Client {
 		String cellLengthStr =kernelBaseLinebundle.getString("trackCellLength");
 		cellLength=Double.valueOf(cellLengthStr);
 		// 周期抽取小车信息
-		runRegrievalTask(this);
+		runRetrievalTask(this);
 		LOG.info("connect to " + ip + ":" + port + "  successful");
 		//
 		WebApplicationContext wac =ContextLoader.getCurrentWebApplicationContext();
@@ -107,16 +99,15 @@ public class Client {
 		this.webSocketMsgService = webSocketMsgService;
 
 	}
-	private  void runRegrievalTask(Client client){
+	private  void runRetrievalTask(Client client){
 		List<Integer> varIDList_high=new ArrayList<Integer>();
 		varIDList_high.add(LSConstants.VARID_POSITOIN);
 		varIDList_high.add(LSConstants.VARID_VELOCITY);
 		varIDList_high.add(LSConstants.VARID_CHARGESTATE);
 		varIDList_high.add(LSConstants.VARID_CHECKPACKAGE);
-		varIDList_high.add(LSConstants.VARID_FLIP_STATE);
-		varIDList_high.add(LSConstants.VARID_JACKING_DISTANCE);
 		varIDList_high.add(LSConstants.VARID_BELT_ROTATION_STATE);
-		varIDList_high.add(LSConstants.VARID_OPERATION_STATE);
+		varIDList_high.add(LSConstants.VARID_CONTAINER_STATE);
+		varIDList_high.add(LSConstants.VARID_SALVER_STATE);
 		CyclicTask task_high = new RetrievalAGVInfoTask(Integer.valueOf(kernelBaseLinebundle.getString("RetrievalAGVMsgTask_high_tSleep")), client,varIDList_high);
 		fixedThreadPool.execute(task_high);
 
@@ -128,7 +119,7 @@ public class Client {
 	}
 	public void listen2Server() {
 		fixedThreadPool.execute(this::handleServerMsg);
-		fixedThreadPool.execute(this::sendHeartBeat);
+//		fixedThreadPool.execute(this::sendHeartBeat);
 	}
 	
 	/**
@@ -191,7 +182,11 @@ public class Client {
 			}
 			PacketModel packetModel = null;
 			try {
-				while (!terminate && (packetModel = SocketUtil.readNextPacketData(is)) != null) {
+				while (!terminate) {
+					if((packetModel = SocketUtil.readNextPacketData(is)) == null){
+						LOG.info("handleServerMsg receive NULL");
+						continue;
+					}
 					try {
 //				LOG.info("command:  " + packetModel.getPacketSerialNo() + "==" + packetModel.getPacketType() + "=="+ Arrays.toString(packetModel.getData_bytes()));
 						int packetType = packetModel.getPacketType();
@@ -289,8 +284,10 @@ public class Client {
 				}
 				LOG.info("handleServerMsg ===end");
 			} catch (IOException e) {
-				LOG.error("指令接收异常!",e);
-				close();
+				if(!isTerminate()){
+					LOG.error("指令接收异常!",e);
+					close();
+				}
 			}
 	}
 	
@@ -299,10 +296,11 @@ public class Client {
 	 */
 	private void handleSendNaviTaskResponse(PacketModel packetModel) {
 		NaviTask naviTask = new NaviTask().fromBytes(packetModel.getData_bytes());
+		LOG.info("处理发送导航任务应答包:{}",naviTask.getTaskID());
 		TransportOrder transportOrder =transportOrderPool.getTransportOrderByNaviTaskID(naviTask.getTaskID());
 		if(LSConstants.ERROR_CODE_SUCCESS==packetModel.getErrorCode()  && transportOrder.getNaviTask().isCompleteNavi()){
-			while(!(vehicle.getPosition().equals(transportOrder.getDestCoor())));
-			transportOrder.setState(TransportOrder.STATE.FINISHED);
+//			while(!(vehicle.getPosition().equals(transportOrder.getDestCoor())));
+//			transportOrder.setState(TransportOrder.STATE.FINISHED);
 			LOG.info("处理发送导航任务应答包--导航任务完成");
 		}
 		else if (LSConstants.ERROR_CODE_FAILED==packetModel.getErrorCode()){
@@ -322,7 +320,7 @@ public class Client {
 				transportOrder.setState(TransportOrder.STATE.FAILED);
 				LOG.info("取消导航任务完成");
 			}
-			vehicle.setNaviState(NaviStateEnum.IDLE.getValue());
+//			vehicle.setNaviState(NaviStateEnum.IDLE.getValue());
 		}else{
 			throw new SimpleException("取消导航任务失败，任务ID:"+naviTask.getTaskID());
 		}
@@ -339,7 +337,7 @@ public class Client {
 				transportOrder.setState(TransportOrder.STATE.PAUSE);
 				LOG.info("暂停导航任务完成");
 			}
-			vehicle.setNaviState(NaviStateEnum.HANG.getValue());
+//			vehicle.setNaviState(NaviStateEnum.HANG.getValue());
 		}else{
 			throw new SimpleException("暂停导航任务失败，任务ID:"+naviTask.getTaskID());
 		}
@@ -356,7 +354,7 @@ public class Client {
 				transportOrder.setState(TransportOrder.STATE.EXECUTING);
 				LOG.info("恢复导航任务完成");
 			}
-			vehicle.setNaviState(NaviStateEnum.RUNNING.getValue());
+//			vehicle.setNaviState(NaviStateEnum.RUNNING.getValue());
 		}else{
 			throw new SimpleException("恢复导航任务失败，任务ID:"+naviTask.getTaskID());
 		}
@@ -370,7 +368,7 @@ public class Client {
 		if(packetModel.getErrorCode()==LSConstants.ERROR_CODE_SUCCESS){
 			LOG.info("处理查询导航轨迹应答包：{}",JSONObject.toJSONString(queryNaviTrails));
 		}else{
-			throw new SimpleException("查询导航轨失败，任务ID:"+queryNaviTrails.getTaskID());
+			throw new SimpleException("查询导航轨失败");
 		}
 		
 	}
@@ -384,9 +382,9 @@ public class Client {
 		if(packetModel.getErrorCode()==LSConstants.ERROR_CODE_SUCCESS){
 			List<AppendNaviTask> appendNaviTasks = transportOrder.getAppendNavitasks();
 			if(appendNaviTasks.get(appendNaviTasks.size()-1).isDestTrail()){
-				while(!(vehicle.getPosition().equals(transportOrder.getDestCoor())));
-				transportOrder.setState(TransportOrder.STATE.FINISHED);
-				LOG.info("处理追加导航任务应答包:{}，--最终导航，任务完成！",naviTask.getTaskID());
+//				while(!(vehicle.getPosition().equals(transportOrder.getDestCoor())));
+//				transportOrder.setState(TransportOrder.STATE.FINISHED);
+//				LOG.info("处理追加导航任务应答包:{}，--最终导航，任务完成！",naviTask.getTaskID());
 			}
 		}else{
 			throw new SimpleException("追加导航任务失败，任务ID:"+naviTask.getTaskID());
@@ -510,16 +508,18 @@ public class Client {
 			if (item.getVarID() == LSConstants.VARID_POSITOIN) {// 位置
 				// 将变量总的readContent_bytes转换位具体的subVariable对象
 				PositionContent pc =(PositionContent) item.getReadContent();
-				vehicle.setPosition(new Coordinate(pc.getPosition_x(),pc.getPosition_y()));
+				vehicle.setNaviId(pc.getNaviId());
+				vehicle.setPosition(new Coordinate(Math.round(pc.getPosition_x()*100)/100.0,Math.round(pc.getPosition_y()*100)/100.0));
 				vehicle.setAngle(pc.getAngle());
 				vehicle.setPathId(pc.getPathId());
 				vehicle.setConfidenceDegree(pc.getConfidenceDegree());
+//				LOG.info("收到位置信息：x:{},y:{}",vehicle.getPosition().getPosition_x(),vehicle.getPosition().getPosition_y());
 //				vehicle.setNaviState(pc.getNaviState());
-				
+
 			}else if (item.getVarID() == LSConstants.VARID_VELOCITY) {// 速度
 				VelocityContent vv = (VelocityContent) item.getReadContent();
-				vehicle.setVelocity_x(vv.getVx());
-				vehicle.setVelocity_y(vv.getVy());
+				vehicle.setVelocity_x(Math.round(vv.getVx()*100)/100.0);
+				vehicle.setVelocity_y(Math.round(vv.getVy()*100)/100.0);
 				vehicle.setAngularVelocity(vv.getAngularVelocity());
 				vehicle.setRadarCollisionAvoidance(vv.getRadarCollisionAvoidance());
 				vehicle.setMalfunction(vv.getMalfunction());
@@ -531,28 +531,34 @@ public class Client {
 			}else if (item.getVarID() == LSConstants.VARID_CHECKPACKAGE) {// 检测包裹
 				CheckPackageContent cv = (CheckPackageContent) item.getReadContent();
 				vehicle.setHasPackage(cv.getHasPackage());
-			}else if (item.getVarID() == LSConstants.VARID_FLIP_STATE) {// 翻盖状态
-				FlipStateContent cv =  (FlipStateContent) item.getReadContent();
-				vehicle.setFlipState(cv.getFlipState());
-			}else if (item.getVarID() == LSConstants.VARID_JACKING_DISTANCE) {// 顶升距离
-				JackingDistanceContent cv = (JackingDistanceContent) item.getReadContent();
-				vehicle.setJackingDistance(cv.getJackingDistance());
 			}else if (item.getVarID() == LSConstants.VARID_BELT_ROTATION_STATE) {// 皮带转动状态
 				BeltRotationStateContent cv = (BeltRotationStateContent) item.getReadContent();
+				vehicle.setOperationId(cv.getOperationId());
 				vehicle.setBeltRotationState(cv.getBeltRotationState());
-			}else if (item.getVarID() == LSConstants.VARID_OPERATION_STATE) {// 操作状态
-				OperationStateContent cv = (OperationStateContent) item.getReadContent();
-				vehicle.setOperationState(cv.getOperationState());
+			}else if (item.getVarID() == LSConstants.VARID_CONTAINER_STATE) {// 货柜状态
+				ContainerStateContent cv = (ContainerStateContent) item.getReadContent();
+				vehicle.setOperationId(cv.getOperationId());
+				vehicle.setContainerState(cv.getContainerState());
 			}else if (item.getVarID() == LSConstants.VARID_BATTERYCAPACITY) {// 电池容量
 				BatteryCapacityContent cv = (BatteryCapacityContent) item.getReadContent();
 				vehicle.setBatteryCapacity(cv.getBatteryCapacity());
 				vehicle.setBatteryResidues(cv.getBatteryResidues());
 				vehicle.setBatteryState(cv.getBatteryState());
+			}else if (item.getVarID() == LSConstants.VARID_SALVER_STATE) {// 托盘状态
+				SalverStateContent cv =(SalverStateContent) item.getReadContent();
+				vehicle.setSalverState(cv.getSalverState());
 			}
-			
+
+
+		}
+		if(vehicle.getPosition()==null){
+			LOG.info("position null:"+JSONObject.toJSONString(vehicle));
 		}
 //		LOG.info("更新车辆信息：{}" + JSONObject.toJSONString(vehicle));
 		VehicleDto vehicleDto =BeanConvertUtil.beanConvert(vehicle, VehicleDto.class);
+		if(vehicleDto.getPosition()==null){
+			LOG.info(JSONObject.toJSONString(vehicle));
+		}
 		TranslateUtil.translateEntity(vehicleDto);
 		CommandDto cmd = new CommandDto(CommandDto.TYPE.setVehicleInfo.name(), vehicleDto);
 		webSocketMsgService.sendToAll(TopicAddressConstants.setVehicleInfo,JSONObject.toJSONString(cmd));
@@ -643,6 +649,8 @@ public class Client {
 			packetModel.setErrorCode(LSConstants.ERROR_CODE_SUCCESS);
 			packetModel.setPacketType(LSConstants.PACKET_TYPE_SEND_NAVITASK);
 			packetModel.setData_bytes(naviTask.toBytes());
+
+			System.out.println("导航任务："+SocketUtil.bytesToHex(SocketUtil.packetMessage(packetModel)));
 			sendMsgToServer(packetModel);
 			vehicle.setNaviState(NaviStateEnum.RUNNING.getValue());
 		}catch (SimpleException e) {
@@ -664,7 +672,7 @@ public class Client {
 			throw new SimpleException("当前车辆未执行导航任务！");
 		}
 		// 暂定查询10条
-		QueryNaviTrailsRequest queryNaviTrails = new QueryNaviTrailsRequest(transportOrder.getNaviTaskID(),20);
+		QueryNaviTrailsRequest queryNaviTrails = new QueryNaviTrailsRequest(20);
 		PacketModel packetModel = new PacketModel();
 		packetModel.setPacketSerialNo(PacketSerialNo.getSerialNo());
 		packetModel.setErrorCode(LSConstants.ERROR_CODE_SUCCESS);
@@ -811,6 +819,11 @@ public class Client {
 	 * 清除错误
 	 */
 	public void clearError(){
+			if(vehicle.getTransportOrder()!=null && vehicle.getTransportOrder().getState()!=TransportOrder.STATE.FINISHED
+					&& vehicle.getTransportOrder().getState()!=TransportOrder.STATE.FAILED){
+				vehicle.getTransportOrder().setState(TransportOrder.STATE.FAILED);
+				vehicle.setNaviState(NaviStateEnum.IDLE.getValue());
+			}
 		LOG.info("清除错误");
 		PacketModel packetModel = new PacketModel();
 		packetModel.setPacketSerialNo(PacketSerialNo.getSerialNo());
@@ -980,7 +993,7 @@ public class Client {
 		}
 		List<NaviTrail> trails=generateTrails(coorList);
 		printNaviTrails(trails);
-		naviTask = new SendNaviTask(transportOrder.getNaviTaskID(), 0, 0, 0, 0, false, trails.size(), trails);
+		naviTask = new SendNaviTask(transportOrder.getNaviTaskID(),0, 0, 0, 0, 0, true, trails.size(), trails);
 		return naviTask;
 	}
 	private void printNaviTrails(List<NaviTrail> trails) {
@@ -1082,5 +1095,9 @@ public class Client {
 		return terminate;
 	}
 
-	
+	@Override
+	protected void finalize() throws Throwable {
+		super.finalize();
+		LOG.info("====client finalize:{}");
+	}
 }

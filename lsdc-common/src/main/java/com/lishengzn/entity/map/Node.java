@@ -18,6 +18,10 @@ public class Node extends MapObj{
 	public void setPosition(Coordinate position) {
 		this.position = position;
 	}
-	
+
+	public Node clone(){
+		Node newNode = new Node(getId(),position.clone());
+		return newNode;
+	}
 
 }

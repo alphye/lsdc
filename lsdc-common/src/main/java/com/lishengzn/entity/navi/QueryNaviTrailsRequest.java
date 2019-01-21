@@ -1,6 +1,7 @@
 package com.lishengzn.entity.navi;
 
 import com.google.common.primitives.Bytes;
+import com.lishengzn.entity.DataArea;
 import com.lishengzn.util.SocketUtil;
 
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import java.util.List;
  * @author Administrator
  *
  */
-public class QueryNaviTrailsRequest extends NaviTask{
+public class QueryNaviTrailsRequest implements DataArea {
 	/**
 	 * 需要最近多少条轨迹数 据
 	 */
@@ -21,8 +22,7 @@ public class QueryNaviTrailsRequest extends NaviTask{
 	}
 	
 
-	public QueryNaviTrailsRequest(long taskID, int naviTrailNum) {
-		super(taskID);
+	public QueryNaviTrailsRequest( int naviTrailNum) {
 		this.naviTrailNum = naviTrailNum;
 	}
 
@@ -37,18 +37,16 @@ public class QueryNaviTrailsRequest extends NaviTask{
 	@Override
 	public byte[] toBytes() {
 		List<Byte> byteList=new ArrayList<Byte>();
-		byteList.addAll(Bytes.asList(SocketUtil.longToBytes(taskID)));
 		byteList.addAll(Bytes.asList(SocketUtil.intToBytes(naviTrailNum )));
 		return Bytes.toArray(byteList);
 	}
 
 	@Override
 	public QueryNaviTrailsRequest fromBytes(byte[] data_bytes) {
-		if(data_bytes.length!=12){
-			throw new RuntimeException("查询导航轨迹的数据长度须为12！");
+		if(data_bytes.length!=4){
+			throw new RuntimeException("查询导航轨迹的数据长度须为4！");
 		}
-		this.setTaskID(SocketUtil.bytesToLong(Arrays.copyOf(data_bytes, 8)));
-		this.setNaviTrailNum(SocketUtil.bytesToInt(Arrays.copyOfRange(data_bytes, 8, 12)));
+		this.setNaviTrailNum(SocketUtil.bytesToInt(Arrays.copyOfRange(data_bytes, 0, 4)));
 		return this;
 	}
 	

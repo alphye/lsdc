@@ -25,10 +25,9 @@ public class RetrievalAGVInfoTask extends CyclicTask{
 		requestVariableMap.put(LSConstants.VARID_VELOCITY, new ReadItem_Request(LSConstants.VARTYPE_VELOCITY,LSConstants.VARID_VELOCITY,0,0));
 		requestVariableMap.put(LSConstants.VARID_CHARGESTATE, new ReadItem_Request(LSConstants.VARTYPE_CHARGESTATE,LSConstants.VARID_CHARGESTATE,0,0));
 		requestVariableMap.put(LSConstants.VARID_CHECKPACKAGE, new ReadItem_Request(LSConstants.VARTYPE_CHECKPACKAGE,LSConstants.VARID_CHECKPACKAGE,0,0));
-		requestVariableMap.put(LSConstants.VARID_FLIP_STATE, new ReadItem_Request(LSConstants.VARTYPE_FLIP_STATE,LSConstants.VARID_FLIP_STATE,0,0));
-		requestVariableMap.put(LSConstants.VARID_JACKING_DISTANCE, new ReadItem_Request(LSConstants.VARTYPE_JACKING_DISTANCE,LSConstants.VARID_JACKING_DISTANCE,0,0));
 		requestVariableMap.put(LSConstants.VARID_BELT_ROTATION_STATE, new ReadItem_Request(LSConstants.VARTYPE_BELT_ROTATION_STATE,LSConstants.VARID_BELT_ROTATION_STATE,0,0));
-		requestVariableMap.put(LSConstants.VARID_OPERATION_STATE, new ReadItem_Request(LSConstants.VARTYPE_OPERATION_STATE,LSConstants.VARID_OPERATION_STATE,0,0));
+		requestVariableMap.put(LSConstants.VARID_CONTAINER_STATE, new ReadItem_Request(LSConstants.VARTYPE_CONTAINER_STATE,LSConstants.VARID_CONTAINER_STATE,0,0));
+		requestVariableMap.put(LSConstants.VARID_SALVER_STATE, new ReadItem_Request(LSConstants.VARTYPE_SALVER_STATE,LSConstants.VARID_SALVER_STATE,0,0));
 		requestVariableMap.put(LSConstants.VARID_BATTERYCAPACITY, new ReadItem_Request(LSConstants.VARTYPE_BATTERYCAPACITY,LSConstants.VARID_BATTERYCAPACITY,0,0));
 		
 	}

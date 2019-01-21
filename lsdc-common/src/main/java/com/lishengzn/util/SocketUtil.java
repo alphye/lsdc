@@ -2,6 +2,8 @@ package com.lishengzn.util;
 
 import com.lishengzn.packet.PacketModel;
 import com.lishengzn.packet.PacketSerialNo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -10,6 +12,7 @@ import java.util.Arrays;
 
 /*Nspd:[78, 115, 112, 100]*/
 public class SocketUtil {
+	private static final Logger LOG = LoggerFactory.getLogger(SocketUtil.class);
 	/**
 	 * int转byte[] 小 端
 	 * 
@@ -373,6 +376,7 @@ public class SocketUtil {
 			// 底层包头，前4位，固定格式
 			String Nspd = new String(Arrays.copyOf(head, 4));
 			if (!"Nspd".equals(Nspd)) {
+				LOG.info("=======not Nspd:{}",Arrays.toString(head));
 				return null;
 			}
 			// 底层包头，4-7位，数据域包长度
@@ -380,6 +384,7 @@ public class SocketUtil {
 			int packetLength = bytesToInt(packetLength_bytes);
 			byte[] dataPacket_bytes = new byte[packetLength];
 			if (bis.read(dataPacket_bytes) < 0) {
+				LOG.info("=======readLeng<0");
 				return null;
 			}
 			return unPacketDataPacket(dataPacket_bytes);
@@ -407,7 +412,7 @@ public class SocketUtil {
 		int errorCode = bytesToInt(Arrays.copyOfRange(dataPacket_bytes, 12, 16));
 		packetModel.setErrorCode(errorCode);
 		if (dataPacket_bytes.length - dataLength != 24) {
-			throw new RuntimeException("报文长度校验异常！");
+			throw new RuntimeException("报文长度校验异常："+"包类型"+Integer.toHexString(packetType)+"数据域长度："+dataPacket_bytes.length+"数据长度："+dataLength);
 		}
 		// 数据包，24之后都是数据域
 		byte data_bytes[] = Arrays.copyOfRange(dataPacket_bytes, 24, dataPacket_bytes.length);

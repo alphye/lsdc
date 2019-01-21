@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.junit.Test;
 
@@ -27,13 +28,9 @@ public class MyTest {
 
 	@Test
 	public void test1(){
-		 String[] str = new String[] { "you", "wu" };    
-		 List list = new ArrayList(Arrays.asList(str)); 
-		 str[0]="s1";
-		 System.out.println(list.get(0));
-		 list.add("yangguanbao"); 
+		System.out.println(Integer.toHexString(-2147483135));
 	}
-	
+
 	@Test
 	public void Test2() throws InstantiationException, IllegalAccessException{
 		VehicleDto dto = new VehicleDto();

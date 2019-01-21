@@ -12,7 +12,8 @@ public class VehicleDto implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
+	private String vehicleIp;
 	/**
 	 * 车辆位置
 	 */
@@ -139,37 +140,13 @@ public class VehicleDto implements Serializable{
 	}
 
 
-
-	public VehicleDto(Coordinate position,  double velocity_x, double velocity_y, double velocity,
-			double angularVelocity, double acceleration, int angle, int pathId, int naviState, int confidenceDegree,
-			int radarCollisionAvoidance, int malfunction, int mileage, int contactChargingPile,int relayOn,int hasPackage,
-			int flipState,int jackingDistance,int beltRotationState,int operationState,int batteryCapacity,double batteryResidues,int batteryState) {
-		super();
-		this.position = position;
-		this.velocity_x = velocity_x;
-		this.velocity_y = velocity_y;
-		this.velocity = velocity;
-		this.angularVelocity = angularVelocity;
-		this.acceleration = acceleration;
-		this.angle = angle;
-		this.pathId = pathId;
-		this.naviState = naviState;
-		this.confidenceDegree = confidenceDegree;
-		this.radarCollisionAvoidance = radarCollisionAvoidance;
-		this.malfunction = malfunction;
-		this.mileage = mileage;
-		this.contactChargingPile=contactChargingPile;
-		this.relayOn=relayOn;
-		this.hasPackage=hasPackage;
-		this.flipState=flipState;
-		this.setJackingDistance(jackingDistance);
-		this.beltRotationState =beltRotationState;
-		this.operationState=operationState;
-		this.batteryCapacity=batteryCapacity;
-		this.batteryResidues=batteryResidues;
-		this.batteryState =batteryState;
+	public String getVehicleIp() {
+		return vehicleIp;
 	}
 
+	public void setVehicleIp(String vehicleIp) {
+		this.vehicleIp = vehicleIp;
+	}
 
 	public Coordinate getPosition() {
 		return position;

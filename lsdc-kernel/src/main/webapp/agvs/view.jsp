@@ -163,7 +163,7 @@ iframe{
 		<div id="content" class="content" align="left">
 			<div class="west">
 				<div id="vehicleInfo" class="vehicleInfo" align="center">
-					<input type="hidden" id="vehicleIp"/>
+					<input type="text" id="vehicleIp"/>
 					<table style="position: relative;top: 20%;">
 						<tr class='outlinedA'>
 							<td class="lable">当前位置：</td>

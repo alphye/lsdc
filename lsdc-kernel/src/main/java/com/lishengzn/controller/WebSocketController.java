@@ -246,9 +246,17 @@ public class WebSocketController {
     /**
      * 车辆上线
      */
-    @MessageMapping("/verhicleOnline")
-    public void verhicleOnline( ) throws IOException {
+    @MessageMapping("/vehicleOnline")
+    public void vehicleOnline( ) throws IOException {
         webSocketMsgService.vehicleOnline();
+    }
+
+    /**
+     * 车辆上线
+     */
+    @MessageMapping("/vehicleOffline")
+    public void vehicleOffline( ) throws IOException {
+        webSocketMsgService.vehicleOffline();
     }
 
     @MessageMapping("/retrievalVehicleInfo")

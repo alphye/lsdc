@@ -48,7 +48,12 @@ public class Edge extends MapObj{
 		this.endNodeCoor = endNodeCoor;
 	}
 
-
+	public Edge clone(){
+		Edge newEdge =new Edge(getId(),startNodeId,endNodeId);
+		newEdge.startNodeCoor=startNodeCoor.clone();
+		newEdge.endNodeCoor=endNodeCoor.clone();
+		return newEdge;
+	}
 
 	
 

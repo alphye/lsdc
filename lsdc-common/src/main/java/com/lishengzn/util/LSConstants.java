@@ -80,13 +80,16 @@ public interface LSConstants {
 	static final int VARID_BELT_ROTATION_STATE=7;
 	/** 变量ID：读取当前操作状态，操作状态包括：操作已完成、操作进行中、操作出错等 */
 	static final int VARID_OPERATION_STATE=8;
+	/** 变量ID：读取货柜状态 */
+	static final int VARID_CONTAINER_STATE=8;
 	/** 变量ID：读取AGV电池容量 */
 	static final int VARID_BATTERYCAPACITY=9;
 	/** 变量ID：读取AGV电池容量 */
 	static final int VARID_STOPCHARGE=10;
 	/** 变量ID：写入包裹大小 */
 	static final int VARID_PACKAGESIZE=11;
-	
+	/** 变量ID：读取托盘状态 */
+	static final int VARID_SALVER_STATE=12;
 	
 	
 	/**
@@ -108,6 +111,11 @@ public interface LSConstants {
 	static final int VARTYPE_BELT_ROTATION_STATE=0x3;
 	/** 变量类型：读取当前操作状态，操作状态包括：操作已完成、操作进行中、操作出错等 */
 	static final int VARTYPE_OPERATION_STATE=0x3;
+	/** 变量类型：读取货柜状态 */
+	static final int VARTYPE_CONTAINER_STATE=0x3;
+	/** 变量类型：读取托盘状态 */
+	static final int VARTYPE_SALVER_STATE=0x3;
+
 	/** 变量类型：读取AGV电池容量 */
 	static final int VARTYPE_BATTERYCAPACITY=0x9;
 	/** 变量ID：读取AGV电池容量 */
@@ -145,8 +153,8 @@ public interface LSConstants {
 	static final int OPERATIONCODE_CONTAINER_DIRECTION= 0x031;
 	
 	/** 控制充电--开始充电*/
-	static final int CONTROLCHARGE_START= 2;
+	static final int CONTROLCHARGE_START= 0x2;
 	/** 控制充电--停止充电*/
-	static final int CONTROLCHARGE_STOP= 0;
+	static final int CONTROLCHARGE_STOP= 0x0;
 	
 }

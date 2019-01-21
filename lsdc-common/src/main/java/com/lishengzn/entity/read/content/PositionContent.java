@@ -1,14 +1,18 @@
 package com.lishengzn.entity.read.content;
 
+import com.google.common.primitives.Bytes;
 import com.lishengzn.util.SocketUtil;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**读取当前导航状态及位置信息
  * @author Administrator
  *
  */
 public class PositionContent extends VariableContent {
+	private long naviId;
 	/**
 	 * x坐标
 	 */
@@ -37,24 +41,24 @@ public class PositionContent extends VariableContent {
 	
 	public PositionContent() {
 	}
-	
 
-	/**
-	 * @param position_x
-	 * @param position_y
-	 * @param angle
-	 * @param confidenceDegree
-	 * @param pathId
-	 * @param naviState
-	 */
-	public PositionContent(double position_x, double position_y, double angle, int confidenceDegree, int pathId,
-			int naviState) {
+
+	public PositionContent(long naviId, double position_x, double position_y, double angle, int confidenceDegree, int pathId, int naviState) {
+		this.naviId = naviId;
 		this.position_x = position_x;
 		this.position_y = position_y;
 		this.angle = angle;
 		this.confidenceDegree = confidenceDegree;
 		this.pathId = pathId;
 		this.naviState = naviState;
+	}
+
+	public long getNaviId() {
+		return naviId;
+	}
+
+	public void setNaviId(long naviId) {
+		this.naviId = naviId;
 	}
 
 	public double getPosition_x() {
@@ -116,35 +120,29 @@ public class PositionContent extends VariableContent {
 
 	@Override
 	public byte[] toBytes() {
-
-		byte[] position_x_byte = SocketUtil.doubleToBytes(position_x);
-		byte[] position_y_byte = SocketUtil.doubleToBytes(position_y);
-		byte[] angle_byte = SocketUtil.doubleToBytes(angle);
-		byte[] confidenceDegree_byte = SocketUtil.intToBytes(confidenceDegree);
-		byte[] pathId_byte = SocketUtil.intToBytes(pathId);
-		byte[] naviState_byte = SocketUtil.intToBytes(naviState);
-		byte[] subVar_bytes = new byte[position_x_byte.length+position_y_byte.length+angle_byte.length+confidenceDegree_byte.length+pathId_byte.length+naviState_byte.length];
-		System.arraycopy(position_x_byte, 0, subVar_bytes, 0, position_x_byte.length);
-		System.arraycopy(position_y_byte, 0, subVar_bytes, 8, position_y_byte.length);
-		System.arraycopy(angle_byte, 0, subVar_bytes, 16, angle_byte.length);
-		System.arraycopy(confidenceDegree_byte, 0, subVar_bytes, 24, confidenceDegree_byte.length);
-		System.arraycopy(pathId_byte, 0, subVar_bytes, 28, pathId_byte.length);
-		System.arraycopy(naviState_byte, 0, subVar_bytes, 32, naviState_byte.length);
-
-		return subVar_bytes;
+		List<Byte> byteList=new ArrayList<Byte>();
+		byteList.addAll(Bytes.asList(SocketUtil.longToBytes(naviId)));
+		byteList.addAll(Bytes.asList(SocketUtil.doubleToBytes(position_x)));
+		byteList.addAll(Bytes.asList(SocketUtil.doubleToBytes(position_y)));
+		byteList.addAll(Bytes.asList(SocketUtil.doubleToBytes(angle)));
+		byteList.addAll(Bytes.asList(SocketUtil.intToBytes(confidenceDegree)));
+		byteList.addAll(Bytes.asList(SocketUtil.intToBytes(pathId)));
+		byteList.addAll(Bytes.asList(SocketUtil.intToBytes(naviState)));
+		return Bytes.toArray(byteList);
 	}
 
 	@Override
 	public PositionContent fromBytes(byte[] subVar_bytes) {
-		if(subVar_bytes.length!=36){
-			throw new RuntimeException("“位置及导航信息”变量内容字节数须为36");
+		if(subVar_bytes.length!=44){
+			throw new RuntimeException("“位置及导航信息”变量内容字节数须为44");
 		}
-		this.setPosition_x(SocketUtil.bytesToDouble(Arrays.copyOfRange(subVar_bytes, 0, 8)));
-		this.setPosition_y(SocketUtil.bytesToDouble(Arrays.copyOfRange(subVar_bytes, 8, 16)));
-		this.setAngle(SocketUtil.bytesToDouble(Arrays.copyOfRange(subVar_bytes, 16, 24)));
-		this.setConfidenceDegree(SocketUtil.bytesToInt(Arrays.copyOfRange(subVar_bytes, 24, 28)));
-		this.setPathId(SocketUtil.bytesToInt(Arrays.copyOfRange(subVar_bytes, 28, 32)));
-		this.setNaviState(SocketUtil.bytesToInt(Arrays.copyOfRange(subVar_bytes, 32, subVar_bytes.length)));
+		this.setNaviId(SocketUtil.bytesToLong(Arrays.copyOfRange(subVar_bytes, 0, 8)));
+		this.setPosition_x(SocketUtil.bytesToDouble(Arrays.copyOfRange(subVar_bytes, 8, 16)));
+		this.setPosition_y(SocketUtil.bytesToDouble(Arrays.copyOfRange(subVar_bytes, 16, 24)));
+		this.setAngle(SocketUtil.bytesToDouble(Arrays.copyOfRange(subVar_bytes, 24, 32)));
+		this.setConfidenceDegree(SocketUtil.bytesToInt(Arrays.copyOfRange(subVar_bytes, 32, 36)));
+		this.setPathId(SocketUtil.bytesToInt(Arrays.copyOfRange(subVar_bytes, 36, 40)));
+		this.setNaviState(SocketUtil.bytesToInt(Arrays.copyOfRange(subVar_bytes, 40, 44)));
 		return this;
 	}
 

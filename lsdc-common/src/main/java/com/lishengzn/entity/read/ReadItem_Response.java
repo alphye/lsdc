@@ -82,12 +82,14 @@ public class ReadItem_Response extends ReadItem {
 			subVar=new JackingDistanceContent();
 		}else if(this.varID==LSConstants.VARID_BELT_ROTATION_STATE){
 			subVar=new BeltRotationStateContent();
-		}else if(this.varID==LSConstants.VARID_OPERATION_STATE){
-			subVar=new OperationStateContent();
+		}else if(this.varID==LSConstants.VARID_CONTAINER_STATE){
+			subVar=new ContainerStateContent();
 		}else if(this.varID==LSConstants.VARID_BATTERYCAPACITY){
 			subVar=new BatteryCapacityContent();
+		}else if(this.varID==LSConstants.VARID_SALVER_STATE){
+			subVar=new SalverStateContent();
 		}else{
-			throw new RuntimeException("读取变量，变量ID不在有效范围内:"+Integer.toHexString(this.varID));
+			throw new RuntimeException("读取变量，变量ID不在有效范围内:"+this.varID);
 		}
 		
 		

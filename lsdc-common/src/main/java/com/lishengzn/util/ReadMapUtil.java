@@ -111,7 +111,13 @@ public class ReadMapUtil {
 	 * @return
 	 */
 	public static boolean checkCoorAtNode(Coordinate coor) {
-		return nodesIDMap.get(coor) != null;
+		Set<Map.Entry<Integer,Node>> entrySet=nodesMap.entrySet();
+		for(Map.Entry<Integer,Node> entry:entrySet){
+			if(nodeEquals(entry.getValue().getPosition(), coor)){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static Node getNearestNode(Coordinate coor,int direction) {
@@ -145,7 +151,7 @@ public class ReadMapUtil {
 			return null;
 		}
 		Node node = new Node(nodeId, coor);
-		return  node;
+		return  node.clone();
 
 	}
 
@@ -164,7 +170,7 @@ public class ReadMapUtil {
 			return null;
 		}
 		Node node = new Node(nodeId, coor);
-		return  node;
+		return  node.clone();
 
 	}
 
@@ -183,7 +189,7 @@ public class ReadMapUtil {
 			return null;
 		}
 		Node node = new Node(nodeId, coor);
-		return  node;
+		return  node.clone();
 	}
 
 	/**
@@ -201,7 +207,7 @@ public class ReadMapUtil {
 			return null;
 		}
 		Node node = new Node(nodeId, coor);
-		return  node;
+		return  node.clone();
 
 	}
 
@@ -211,7 +217,7 @@ public class ReadMapUtil {
 	 * @param id
 	 */
 	public static Edge getEdgeById(Integer id) {
-		return edgesMap.get(id);
+		return edgesMap.get(id).clone();
 
 	}
 
@@ -241,7 +247,7 @@ public class ReadMapUtil {
 	 * @param id
 	 */
 	public static Node getNodeById(Integer id) {
-		return nodesMap.get(id);
+		return nodesMap.get(id).clone();
 
 	}
 
@@ -264,15 +270,28 @@ public class ReadMapUtil {
 			startNodeCoor = node2.clone();
 			endNodeCoor = node1.clone();
 		}
-		Integer id = edgesIDMap.get(startNodeCoor.getPosition_x() + "," + startNodeCoor.getPosition_y() + ","
-				+ endNodeCoor.getPosition_x() + "," + endNodeCoor.getPosition_y());
+		/*Integer id = edgesIDMap.get(startNodeCoor.getPosition_x() + "," + startNodeCoor.getPosition_y() + ","
+				+ endNodeCoor.getPosition_x() + "," + endNodeCoor.getPosition_y());*/
+		Integer id=null;
+		Set<Map.Entry<Integer,Edge>> entrySet=edgesMap.entrySet();
+		for(Map.Entry<Integer,Edge> entry:entrySet){
+			Node startNode =nodesMap.get(entry.getValue().getStartNodeId());
+			Node endNode =nodesMap.get(entry.getValue().getEndNodeId());
+			if(nodeEquals(startNode.getPosition(), startNodeCoor) && nodeEquals(endNode.getPosition(), endNodeCoor)){
+				id=entry.getValue().getId();
+				break;
+			}
+		}
 		if (null == id) {
 			LOG.error("要查找的边不在地图范围内，startNode:{}  endNodeCoor:{}", startNodeCoor.toString(), endNodeCoor.toString());
 			throw new SimpleException("目标位置不在地图范围内！");
 		}
 		return id;
 	}
-
+	private static boolean nodeEquals(Coordinate node1, Coordinate node2){
+		double d =Math.abs(node1.getPosition_x()-node2.getPosition_x())+Math.abs(node1.getPosition_y()-node2.getPosition_y());
+		return d<=10;
+	}
 	public static void generateJSONMap() {
 		JSONObject json = new JSONObject();
 		json.put("nodes", nodesMap.values());

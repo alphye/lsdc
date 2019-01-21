@@ -44,6 +44,7 @@ public class Server {
 	private ServerSocket serverSocket = null;
 	public  static volatile Vehicle vehicle01 = new Vehicle(new Coordinate(0, 0));
 
+
 	public static Server getInstance() {
 		return ServerInstance.serverInstance;
 	}
@@ -75,11 +76,11 @@ public class Server {
 	}
 
 	public void doSocket() throws Exception {
-
+		ClientHandler clientHandler=null;
 		while(true){
 			Socket socket = getSocket();
 			LOG.info("客户端连接：" + socket.getInetAddress().getHostAddress());
-			ClientHandler clientHandler = new ClientHandler(socket);
+			clientHandler = new ClientHandler(socket);
 			threadPool.execute(clientHandler);
 			initializeVehicle();
 		}
@@ -99,6 +100,8 @@ public class Server {
 
 class ClientHandler implements Runnable {
 	private static final Logger LOG = LoggerFactory.getLogger(ClientHandler.class);
+	private long naviId;
+	private long operationId;
 	private volatile boolean terminate;
 	private Socket socket;
 	long lastHeartBeatTime;
@@ -115,6 +118,7 @@ class ClientHandler implements Runnable {
 	public ClientHandler(Socket socket) {
 		super();
 		terminate = false;
+		naviId=0L;
 		this.socket = socket;
 	}
 
@@ -130,12 +134,21 @@ class ClientHandler implements Runnable {
 
 	public void handleSocket() throws IOException {
 		lastHeartBeatTime = System.currentTimeMillis();// 启动监听之前先把lastHeartBeatTime初始化
-		new Thread(() -> listen2Server(socket)).start();
-		/*
-		new Thread(() -> simulationVehicle01Move(socket)).start();
-		new Thread(() -> up_state()).start();
-		new Thread(() -> simulationOther()).start();*/
-
+		new Thread(() -> listen2Server(socket),"listen2Server"+System.currentTimeMillis()).start();
+		new Thread(() -> {
+			handleHeartBeat(socket);
+		},"handleHeartBeat"+System.currentTimeMillis()).start();
+	}
+	private void handleHeartBeat(Socket socket) {
+		while(!isTerminate() && !socket.isClosed()){
+			if(System.currentTimeMillis() - lastHeartBeatTime < 1000000000){
+				continue;
+			}
+			// 走到这里，则说明超时未收到心跳
+			LOG.error("超时未收到心跳，连接关闭！{}", System.currentTimeMillis() - lastHeartBeatTime);
+			break;
+		}
+		close();
 	}
 	public void sendMsgToClient(PacketModel packetModel) throws IOException {
 		OutputStream os = null;
@@ -179,7 +192,7 @@ class ClientHandler implements Runnable {
 		InputStream is = null;
 		try {
 			is = socket.getInputStream();
-			while (System.currentTimeMillis() - lastHeartBeatTime < 100000000) {// 心跳未超时
+			while (!isTerminate()) {
 				PacketModel packetModel = null;
 				// 如果能读取取数据包
 				if (!((packetModel = SocketUtil.readNextPacketData(is)) == null)) {
@@ -261,9 +274,7 @@ class ClientHandler implements Runnable {
 					
 				}
 			}
-			// 走到这里，则说明超时未收到心跳
-			LOG.error("超时未收到心跳，连接关闭！{}", System.currentTimeMillis() - lastHeartBeatTime);
-			close();
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			close();
@@ -285,16 +296,14 @@ class ClientHandler implements Runnable {
 				item_response = responseChargeState(item_request);
 			}else if (item_request.getVarID() == LSConstants.VARID_CHECKPACKAGE) {// 检测是否有包裹
 				item_response = responseCheckPackage(item_request);
-			}else if (item_request.getVarID() == LSConstants.VARID_FLIP_STATE) {// 翻盖状态
-				item_response = responseFlipState(item_request);
-			}else if (item_request.getVarID() == LSConstants.VARID_JACKING_DISTANCE) {//顶升距离
-				item_response = responseJackingDistance(item_request);
 			}else if (item_request.getVarID() == LSConstants.VARID_BELT_ROTATION_STATE) {// 皮带转动状态
 				item_response = responseBeltRotationState(item_request);
-			}else if (item_request.getVarID() == LSConstants.VARID_OPERATION_STATE) {// 操作状态
-				item_response = responseOperationState(item_request);
+			}else if (item_request.getVarID() == LSConstants.VARID_CONTAINER_STATE) {// 货柜状态
+				item_response = responseContainerState(item_request);
 			}else if (item_request.getVarID() == LSConstants.VARID_BATTERYCAPACITY) {// 电池容量
 				item_response = responseBatteryCapacity(item_request);
+			}else if (item_request.getVarID() == LSConstants.VARID_SALVER_STATE) {// 托盘状态
+				item_response = responseSalverState(item_request);
 			}
 			
 			else {
@@ -335,6 +344,7 @@ class ClientHandler implements Runnable {
 	private void doCarrayOutNaviTask(PacketModel packetModel){
 		SendNaviTask naviTask = new SendNaviTask().fromBytes(packetModel.getData_bytes());
 		abortTask=false;
+		naviId++;
 		try {
 			LOG.info("接收到导航任务：{}",JSONObject.toJSONString(naviTask));
 			// 向调度应答导航任务
@@ -344,6 +354,7 @@ class ClientHandler implements Runnable {
 			sendMsgToClient(packetModel);
 		} catch (IOException e) {
 			LOG.error("应答发送导航任务，指令发送异常！",e);
+			return;
 		}
 		try {
 			if(Server.vehicle01.getNaviState()!=NaviStateEnum.IDLE.getValue()){
@@ -390,6 +401,10 @@ class ClientHandler implements Runnable {
 		Coordinate nextCoor=null;
 		while(Server.vehicle01.getNaviState()==NaviStateEnum.RUNNING.getValue() ){
 			if((nextCoor=vehiclePassingCoorQueue.peek())!=null){
+				if(vehiclePassingCoorQueue.size()==1){
+					nextCoor.setPosition_x(nextCoor.getPosition_x()-4);
+					nextCoor.setPosition_y(nextCoor.getPosition_y()-4);
+				}
 				if(!moveTo(nextCoor)){
 					LOG.info("中止行进");
 					vehiclePassingCoorQueue.clear();
@@ -569,7 +584,7 @@ class ClientHandler implements Runnable {
 		QueryNaviTrailsRequest queryNaviTrailsRequest = new QueryNaviTrailsRequest().fromBytes(packetModel.getData_bytes()); 
 		LOG.info("查询导航轨迹：{}",JSONObject.toJSONString(queryNaviTrailsRequest));
 		List<NaviTrail> naviTrails= naviTrailsQueue4Query.getLastElements(queryNaviTrailsRequest.getNaviTrailNum());
-		QueryNaviTrailsResponse queryNaviTrailsResponse = new QueryNaviTrailsResponse(queryNaviTrailsRequest.getTaskID(),naviTrails.size(),naviTrails);
+		QueryNaviTrailsResponse queryNaviTrailsResponse = new QueryNaviTrailsResponse(naviTrails.size(),naviTrails);
 		LOG.info("查询导航轨迹结果：{}",JSONObject.toJSONString(queryNaviTrailsResponse));
 		packetModel.setData_bytes(queryNaviTrailsResponse.toBytes());
 		packetModel.setPacketType(SocketUtil.getResponsePacketType(packetModel.getPacketType()));
@@ -587,6 +602,7 @@ class ClientHandler implements Runnable {
 	private void doCarrayOutOperationTask(PacketModel packetModel){
 		SendOperationTask sendOperationTask =new SendOperationTask().fromBytes(packetModel.getData_bytes());
 		LOG.info("接收到操作任务：{}",JSONObject.toJSONString(sendOperationTask));
+        operationId++;
 		OperationTask operationTask = new OperationTask();
 		operationTask.setTaskID(sendOperationTask.getTaskID());
 		packetModel.setData_bytes(operationTask.toBytes());
@@ -595,6 +611,7 @@ class ClientHandler implements Runnable {
 			sendMsgToClient(packetModel);
 		} catch (IOException e) {
 			LOG.error("应答操作任务异常！",e);
+			return;
 		}
 		if(sendOperationTask.getOperationCode()==LSConstants.OPERATIONCODE_BELT_ROTATION_ON){
 			// 皮带转动
@@ -743,7 +760,7 @@ class ClientHandler implements Runnable {
 	private ReadItem_Response responsePosition(ReadItem item_request){
 		double x = Server.vehicle01.getPosition().getPosition_x();
 		double y = Server.vehicle01.getPosition().getPosition_y();
-		PositionContent varContent = new PositionContent(x, y,
+		PositionContent varContent = new PositionContent(naviId,x, y,
 				Server.vehicle01.getAngle(), Server.vehicle01.getConfidenceDegree(),
 				Server.vehicle01.getPathId(), Server.vehicle01.getNaviState());
 		ReadItem_Response response =new ReadItem_Response(item_request.getVarType(), item_request.getVarID(), 0,varContent.toBytes().length, varContent);
@@ -785,13 +802,13 @@ class ClientHandler implements Runnable {
 	}
 	
 	private ReadItem_Response responseBeltRotationState(ReadItem item_request){
-		BeltRotationStateContent varContent  = new BeltRotationStateContent(Server.vehicle01.getBeltRotationState());
+		BeltRotationStateContent varContent  = new BeltRotationStateContent(operationId,Server.vehicle01.getBeltRotationState());
 		ReadItem_Response response =new ReadItem_Response(item_request.getVarType(), item_request.getVarID(), 0,varContent.toBytes().length, varContent);
 		return response;
 	}
 	
-	private ReadItem_Response responseOperationState(ReadItem item_request){
-		OperationStateContent varContent  = new OperationStateContent(Server.vehicle01.getOperationState());
+	private ReadItem_Response responseContainerState(ReadItem item_request){
+		ContainerStateContent varContent  = new ContainerStateContent(operationId,Server.vehicle01.getContainerState());
 		ReadItem_Response response =new ReadItem_Response(item_request.getVarType(), item_request.getVarID(), 0,varContent.toBytes().length, varContent);
 		return response;
 	}
@@ -801,14 +818,20 @@ class ClientHandler implements Runnable {
 		ReadItem_Response response =new ReadItem_Response(item_request.getVarType(), item_request.getVarID(), 0,varContent.toBytes().length, varContent);
 		return response;
 	}
+	private ReadItem_Response responseSalverState(ReadItem item_request){
+		SalverStateContent varContent  = new SalverStateContent(Server.vehicle01.getSalverState(),0);
+		ReadItem_Response response =new ReadItem_Response(item_request.getVarType(), item_request.getVarID(), 0,varContent.toBytes().length, varContent);
+		return response;
+	}
 
 	public void close() {
+		LOG.info("socketHandler closed");
 		try {
 			socket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		this.terminate = true;
+		terminate = true;
 		fixedThreadPool.shutdown();
 	}
 
@@ -819,5 +842,9 @@ class ClientHandler implements Runnable {
 	public void setTerminate(boolean terminate) {
 		this.terminate = terminate;
 	}
-
+	@Override
+	protected void finalize() throws Throwable {
+		super.finalize();
+		LOG.info("====clientHandler finalize:{}");
+	}
 }

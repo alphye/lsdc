@@ -9,6 +9,7 @@ import java.util.List;
 
 public class SendNaviTask extends NaviTask{
 
+	private int index;
 	/**
 	 * 目的地边ID
 	 */
@@ -42,9 +43,10 @@ public class SendNaviTask extends NaviTask{
 	
 
 	public SendNaviTask(){}
-	public SendNaviTask(long taskID, int destPathID, double destCoor_x, double destCoor_y, double destAngle,
-			boolean completeNavi, int naviTrailNum, List<NaviTrail> trails) {
+
+	public SendNaviTask(long taskID, int index, int destPathID, double destCoor_x, double destCoor_y, double destAngle, boolean completeNavi, int naviTrailNum, List<NaviTrail> trails) {
 		super(taskID);
+		this.index = index;
 		this.destPathID = destPathID;
 		this.destCoor_x = destCoor_x;
 		this.destCoor_y = destCoor_y;
@@ -52,6 +54,15 @@ public class SendNaviTask extends NaviTask{
 		this.completeNavi = completeNavi;
 		this.naviTrailNum = naviTrailNum;
 		this.trails = trails;
+	}
+
+
+	public int getIndex() {
+		return index;
+	}
+
+	public void setIndex(int index) {
+		this.index = index;
 	}
 
 	public int getDestPathID() {
@@ -114,6 +125,7 @@ public class SendNaviTask extends NaviTask{
 	public byte[] toBytes() {
 		List<Byte> byteList=new ArrayList<Byte>();
 		byteList.addAll(Bytes.asList(SocketUtil.longToBytes(taskID)));
+		byteList.addAll(Bytes.asList(SocketUtil.intToBytes(index)));
 		byteList.addAll(Bytes.asList(SocketUtil.intToBytes(destPathID)));
 		byteList.addAll(Bytes.asList(SocketUtil.doubleToBytes(destCoor_x)));
 		byteList.addAll(Bytes.asList(SocketUtil.doubleToBytes(destCoor_y )));
@@ -131,18 +143,19 @@ public class SendNaviTask extends NaviTask{
 
 	@Override
 	public SendNaviTask fromBytes(byte[] naviTaskVar_bytes) {
-		if(naviTaskVar_bytes.length<41){
-			throw new RuntimeException("发送导航任务的数据长度不得小于41！");
+		if(naviTaskVar_bytes.length<45){
+			throw new RuntimeException("发送导航任务的数据长度不得小于45！");
 		}
 		this.setTaskID(SocketUtil.bytesToLong(Arrays.copyOf(naviTaskVar_bytes, 8)));
-		this.setDestPathID(SocketUtil.bytesToInt(Arrays.copyOfRange(naviTaskVar_bytes, 8,12)));
-		this.setDestCoor_x(SocketUtil.bytesToDouble(Arrays.copyOfRange(naviTaskVar_bytes, 12,20)));
-		this.setDestCoor_y(SocketUtil.bytesToDouble(Arrays.copyOfRange(naviTaskVar_bytes, 20,28)));
-		this.setDestAngle(SocketUtil.bytesToDouble(Arrays.copyOfRange(naviTaskVar_bytes, 28,36)));
-		this.setCompleteNavi(SocketUtil.bytesToBoolean(Arrays.copyOfRange(naviTaskVar_bytes, 36,37)));
-		this.setNaviTrailNum(SocketUtil.bytesToInt(Arrays.copyOfRange(naviTaskVar_bytes, 37,41)));
+		this.setIndex(SocketUtil.bytesToInt(Arrays.copyOfRange(naviTaskVar_bytes, 8,12)));
+		this.setDestPathID(SocketUtil.bytesToInt(Arrays.copyOfRange(naviTaskVar_bytes, 12,16)));
+		this.setDestCoor_x(SocketUtil.bytesToDouble(Arrays.copyOfRange(naviTaskVar_bytes, 16,24)));
+		this.setDestCoor_y(SocketUtil.bytesToDouble(Arrays.copyOfRange(naviTaskVar_bytes, 24,32)));
+		this.setDestAngle(SocketUtil.bytesToDouble(Arrays.copyOfRange(naviTaskVar_bytes, 32,40)));
+		this.setCompleteNavi(SocketUtil.bytesToBoolean(Arrays.copyOfRange(naviTaskVar_bytes, 40,41)));
+		this.setNaviTrailNum(SocketUtil.bytesToInt(Arrays.copyOfRange(naviTaskVar_bytes, 41,45)));
 		// 从41 开始，后边的内容都是trail，每个trail的长度为6
-		int trailStart_index=41;
+		int trailStart_index=45;
 		List<NaviTrail> trails=new ArrayList<NaviTrail>();
 		for(int i=0;i<this.getNaviTrailNum();i++){
 			trails.add(new NaviTrail().fromBytes(Arrays.copyOfRange(naviTaskVar_bytes, trailStart_index,trailStart_index+=6)));
