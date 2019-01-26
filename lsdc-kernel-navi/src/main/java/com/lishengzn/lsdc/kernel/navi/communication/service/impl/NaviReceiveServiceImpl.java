@@ -51,9 +51,6 @@ public class NaviReceiveServiceImpl extends AbstractCommunicateAdapter implement
     }
 
 
-
-
-
     @Override
     public void initialize() {
         super.initialize();
@@ -62,6 +59,9 @@ public class NaviReceiveServiceImpl extends AbstractCommunicateAdapter implement
         } catch (IOException e) {
             throw new SimpleException("与车辆连接异常，请重新连接！");
         }
+
+    }
+    public void runTask(){
         ObjectPool.messageReceiveThreadPool.execute(this::handlReceivedMsg);
     }
 

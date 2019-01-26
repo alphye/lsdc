@@ -24,7 +24,7 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public void allVehiclesOnline() {
         System.gc();
-        List<String> ips = ObjectPool.vehicleIps;
+        List<String> ips = ObjectPool.getVehicleIps();
         for(String ip : ips){
             vehicleOnline(ip);
         }
@@ -38,7 +38,7 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public void allVehiclesOffline() {
-        List<String> ips = ObjectPool.vehicleIps;
+        List<String> ips = ObjectPool.getVehicleIps();
         for(String ip : ips){
             vehicleOffline(ip);
         }

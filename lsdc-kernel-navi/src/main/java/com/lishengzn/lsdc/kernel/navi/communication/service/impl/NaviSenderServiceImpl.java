@@ -28,9 +28,9 @@ public class NaviSenderServiceImpl extends AbstractCommunicateAdapter implements
         try {
             SocketUtil.sendPacketData(out,packetModel);
         } catch (IOException e) {
-            if(ObjectPool.getClientOfVehicle(vehicle.getVehicleIp(), ClientOfVehicle.ClientType.statusAPi)!=null){
+            if(ObjectPool.getClientOfVehicle(vehicle.getVehicleIp(), ClientOfVehicle.ClientType.vehicleNavi)!=null){
                 LOG.error("向小车发送信息异常，IP：{}",vehicle.getVehicleIp());
-                ObjectPool.getClientOfVehicle(vehicle.getVehicleIp(), ClientOfVehicle.ClientType.statusAPi).close();
+                ObjectPool.getClientOfVehicle(vehicle.getVehicleIp(), ClientOfVehicle.ClientType.vehicleNavi).close();
             }
         }
     }
@@ -212,6 +212,11 @@ public class NaviSenderServiceImpl extends AbstractCommunicateAdapter implements
     }
 
     @Override
+    public void runTask() {
+
+    }
+
+    @Override
     public void initialize() {
         super.initialize();
         try {
@@ -219,13 +224,6 @@ public class NaviSenderServiceImpl extends AbstractCommunicateAdapter implements
         } catch (IOException e) {
             throw new SimpleException("与车辆连接异常，请重新连接！");
         }
-        retrievalVehicleInfoTask=new CyclicTask(200) {
-            @Override
-            protected void runActualTask() {
-                queryAll2(false);
-            }
-        };
-        ObjectPool.messageSendThreadPool.execute(retrievalVehicleInfoTask);
     }
 
 

@@ -124,7 +124,13 @@ public interface SocketConstants {
 
     /* 机器人导航端口用到的packetType===end*/
 
+    /* 机器人配置端口用到的packetType===start*/
+    /** 从机器人下载地图*/
+    public static final short PACKET_TYPE_OTHER_DOWNLOAD_MAP = 4011  ;
     /* 其它端口用到的packetType===end*/
+
+
+    /* 其它端口用到的packetType===start*/
     /** 转动 */
     public static final short PACKET_TYPE_OTHER_SETDO = 6001 ;
 

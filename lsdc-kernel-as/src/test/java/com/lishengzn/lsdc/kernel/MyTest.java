@@ -25,7 +25,6 @@ public class MyTest {
 
 	@Test
 	public void test1()  {
-		ClientOfVehicle c = new ClientOfVehicle("127.0.0.1",19204,null,null,ClientOfVehicle.ClientType.statusAPi);
 	}
 
 	@Test
@@ -51,7 +50,7 @@ public class MyTest {
 	}
 
 	public static void main(String[] args){
-		ClientOfVehicle client = new ClientOfVehicle("192.168.0.129",19204,null,null,ClientOfVehicle.ClientType.statusAPi);
+//		ClientOfVehicle client = new ClientOfVehicle("192.168.0.129",19204,null,null,ClientOfVehicle.ClientType.statusAPi);
 		Scanner scanner = new Scanner(System.in);
 		/*APIStatusMessageSenderService service = client.getMessageSenderService();
 		while(scanner.hasNextLine()){

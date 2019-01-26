@@ -1,6 +1,7 @@
 package com.lishengzn.lsdc.kernel.as.controller;
 
 import com.lishengzn.common.service.VehicleService;
+import com.lishengzn.lsdc.kernel.as.shortlink.LoadVehicleMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,10 @@ public class VehicleController {
         vehicleService.vehicleOffline(ip);
     }
 
+    @RequestMapping(value="/downloadMap",method = RequestMethod.GET)
+    public void downloadMap(){
+        LoadVehicleMap.loadMap();
+    }
     @RequestMapping(value="/GC",method = RequestMethod.GET)
     public void GC(){
         System.gc();

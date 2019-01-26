@@ -28,12 +28,14 @@ public class ClientOfVehicle {
 	private AbstractCommunicateAdapter messageSenderService;
 	private AbstractCommunicateAdapter messageReceiveService;
 
-	public ClientOfVehicle(String ip, int port,AbstractCommunicateAdapter messageSenderService,AbstractCommunicateAdapter messageReceiveService,ClientType clientType) {
+	public ClientOfVehicle(String ip, int port,AbstractCommunicateAdapter messageSenderService,AbstractCommunicateAdapter messageReceiveService,ClientType clientType,Vehicle vehicle) {
 		this.ip = ip;
 		this.port = port;
 		this.messageSenderService = messageSenderService;
 		this.messageReceiveService = messageReceiveService;
 		this.clientType=clientType;
+		this.vehicle=vehicle;
+		vehicle.setVehicleIp(ip);
 	}
 
 	public void  initialize(){
@@ -42,15 +44,17 @@ public class ClientOfVehicle {
 		} catch (IOException e) {
 			throw new SimpleException("无法连接到车辆，请确认车辆已开启！");
 		}
-		this.vehicle=new Vehicle(new Coordinate(0,0));
-		vehicle.setVehicleIp(ip);
+
 		messageSenderService.setVehicle(vehicle);
 		messageReceiveService.setVehicle(vehicle);
 		messageSenderService.setSocket(socket);
 		messageReceiveService.setSocket(socket);
 		try {
 			messageSenderService.initialize();
+			messageSenderService.runTask();
+
 			messageReceiveService.initialize();
+			messageReceiveService.runTask();
 			LOG.info("connect to " + ip + ":" + port + "  successful");
 		}catch (Exception e){
 			e.printStackTrace();
@@ -80,9 +84,9 @@ public class ClientOfVehicle {
 		return port;
 	}
 
-	public Vehicle getVehicle() {
-		return vehicle;
-	}
+//	public Vehicle getVehicle() {
+//		return vehicle;
+//	}
 
 	public MessageSenderService getMessageSenderService() {
 		return (MessageSenderService) messageSenderService;

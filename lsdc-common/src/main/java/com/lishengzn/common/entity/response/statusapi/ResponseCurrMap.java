@@ -4,7 +4,7 @@ import com.lishengzn.common.entity.response.ResponseEntity;
 
 import java.util.List;
 
-public class ResponseMapInfo extends ResponseEntity {
+public class ResponseCurrMap extends ResponseEntity {
     /**当前载入的地图; 可缺省：是*/
     private String current_map;
 

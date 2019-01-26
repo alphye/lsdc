@@ -218,6 +218,14 @@ public class StatusAPISenderServiceImpl extends AbstractCommunicateAdapter imple
         } catch (IOException e) {
             throw new SimpleException("与车辆连接异常，请重新连接！");
         }
+
+        // 获取地图信息
+       // queryLoadMapStatus();
+        // 获取地图站点
+       // queryStationInfo();
+    }
+
+    public void runTask(){
         retrievalVehicleInfoTask=new CyclicTask(200) {
             @Override
             protected void runActualTask() {
@@ -225,12 +233,7 @@ public class StatusAPISenderServiceImpl extends AbstractCommunicateAdapter imple
             }
         };
         ObjectPool.messageSendThreadPool.execute(retrievalVehicleInfoTask);
-        // 获取地图信息
-        queryLoadMapStatus();
-        // 获取地图站点
-        queryStationInfo();
     }
-
 
     @Override
     public void terminate() {

@@ -20,7 +20,7 @@ public abstract class AbstractCommunicateAdapter implements Lifecycle {
         this.vehicle = vehicle;
     }
 
-
+    public abstract void runTask();
     @Override
     public boolean isInitialized() {
         return initialized;
@@ -28,8 +28,10 @@ public abstract class AbstractCommunicateAdapter implements Lifecycle {
 
     @Override
     public void initialize() {
-        this.setInitialized(true);
-        this.setTerminate(false);
+        if(!isInitialized()){
+            this.setInitialized(true);
+            this.setTerminate(false);
+        }
     }
 
     @Override

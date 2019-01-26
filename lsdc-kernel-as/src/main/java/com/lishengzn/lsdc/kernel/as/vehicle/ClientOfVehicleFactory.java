@@ -2,6 +2,7 @@ package com.lishengzn.lsdc.kernel.as.vehicle;
 
 import com.lishengzn.common.communication.AbstractCommunicateAdapter;
 import com.lishengzn.common.constants.SocketConstants;
+import com.lishengzn.common.entity.Vehicle;
 import com.lishengzn.common.socket.ClientOfVehicle;
 import com.lishengzn.lsdc.kernel.as.communication.service.impl.StatusAPIReceiveServiceImpl;
 import com.lishengzn.lsdc.kernel.as.communication.service.impl.StatusAPISenderServiceImpl;
@@ -16,7 +17,8 @@ public class ClientOfVehicleFactory {
         }
         AbstractCommunicateAdapter messageSendService = new StatusAPISenderServiceImpl();
         AbstractCommunicateAdapter messageReceiveService = new StatusAPIReceiveServiceImpl();
-        ClientOfVehicle client = new ClientOfVehicle(ip, SocketConstants.SERVER_PORT_STATUS_API,messageSendService,messageReceiveService,clientType);
+        Vehicle vehicle = ObjectPool.createVehicle(ip);
+        ClientOfVehicle client = new ClientOfVehicle(ip, SocketConstants.SERVER_PORT_STATUS_API,messageSendService,messageReceiveService,clientType,vehicle);
         client .initialize();
         ObjectPool.addClientOfVehicle(ip,client, clientType);
         return  client;
