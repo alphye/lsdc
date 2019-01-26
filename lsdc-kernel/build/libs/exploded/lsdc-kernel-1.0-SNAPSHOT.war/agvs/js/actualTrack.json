@@ -1,9 +1,0 @@
-var actualTracks=
-[
-  {"id":111120,index:0,"position":{"X":0.0,"Y":0.0}},
-  {"id":111122,index:1,"position":{"X":0.0,"Y":600.0}},
-  {"id":111115,index:2,"position":{"X":0.0,"Y":1200.0}},
-  {"id":111114,index:3,"position":{"X":0.0,"Y":1800.0}},
-  {"id":111119,index:4,"position":{"X":600.0,"Y":1200.0}},
-  {"id":111118,index:5,"position":{"X":0.0,"Y":2400.0}}
-]
