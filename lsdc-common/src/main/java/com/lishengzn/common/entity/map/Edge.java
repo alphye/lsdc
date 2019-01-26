@@ -1,6 +1,6 @@
-package com.lishengzn.entity.map;
+package com.lishengzn.common.entity.map;
 
-import com.lishengzn.entity.Coordinate;
+import com.lishengzn.lsdc.entity.Coordinate;
 
 public class Edge extends MapObj{
 

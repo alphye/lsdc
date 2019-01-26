@@ -1,4 +1,4 @@
-package com.lishengzn.util;
+package com.lishengzn.lsdc.util;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

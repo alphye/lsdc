@@ -1,4 +1,4 @@
-package com.lishengzn.enums;
+package com.lishengzn.lsdc.enums;
 
 public enum NaviStateEnum {
 	/** 未知		0 */

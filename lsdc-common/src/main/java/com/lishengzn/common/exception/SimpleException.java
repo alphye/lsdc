@@ -1,4 +1,4 @@
-package com.lishengzn.exception;
+package com.lishengzn.common.exception;
 
 public class SimpleException extends RuntimeException {
 

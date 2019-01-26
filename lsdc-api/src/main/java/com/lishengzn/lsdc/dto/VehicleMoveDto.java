@@ -1,8 +1,8 @@
-package com.lishengzn.dto;
+package com.lishengzn.lsdc.dto;
 
 import java.io.Serializable;
 
-import com.lishengzn.entity.Coordinate;
+import com.lishengzn.lsdc.entity.Coordinate;
 
 public class VehicleMoveDto implements Serializable{
 	/**

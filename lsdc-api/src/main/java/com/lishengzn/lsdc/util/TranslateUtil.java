@@ -1,4 +1,4 @@
-package com.lishengzn.util;
+package com.lishengzn.lsdc.util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

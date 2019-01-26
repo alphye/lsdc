@@ -1,5 +1,7 @@
-package com.lishengzn.entity;
+package com.lishengzn.common.entity;
 
+
+import com.lishengzn.lsdc.entity.Coordinate;
 
 import java.io.Serializable;
 
@@ -10,9 +12,6 @@ public class Vehicle implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private long naviId;
-	private long operationId;
-
 	private String vehicleIp;
 	/**
 	 * 车辆位置
@@ -22,15 +21,11 @@ public class Vehicle implements Serializable{
 	/**
 	 * x方向速度
 	 */
-	private double velocity_x;
+	private double vx;
 	/**
 	 * y方向速度
 	 */
-	private double velocity_y;
-	/**
-	 * 速度
-	 */
-	private double velocity;
+	private double vy;
 	
 	/**
 	 * 角速度
@@ -63,60 +58,21 @@ public class Vehicle implements Serializable{
 	 */
 	private int confidenceDegree;
 	
-	/**
-	 * 是否处于雷达防撞
-	 */
-	private int radarCollisionAvoidance;
-	
-	/**
-	 * 是否出现故障
-	 */
-	private int malfunction;
-	
-	/**
+		/**
 	 * 总里程数
 	 */
 	private long mileage;
 	
-	
-	/**
-	 * 是否接触到充电桩
-	 */
-	private int contactChargingPile;
-	
-	/**
-	 * 充电继电器是否打开
-	 */
-	private int relayOn;
-
 	/**
 	 * 小车是否有包裹
 	 */
 	private int hasPackage;
 	
 	/**
-	 * 小车翻盖状态
-	 */
-	private int flipState;
-	
-	/**
-	 * 顶升距离
-	 */
-	private int jackingDistance;
-	
-	/**
 	 * 皮带转动状态
 	 */
 	private int beltRotationState;
-	/**
-	 * 货柜状态
-	 */
-	private int containerState;
 
-	/**
-	 * 托盘状态
-	 */
-	private int salverState;
 	/**
 	 * 操作状态
 	 */
@@ -133,302 +89,154 @@ public class Vehicle implements Serializable{
 	 * 电池余量
 	 */
 	private int batteryResidues;
-	
-	/**
-	 * 电池状态
-	 */
-	private int batteryState;
-	
+
 	
 	public Vehicle(){}
 	public Vehicle(Coordinate position){
 		this.position=position;
 	}
 
-
-	public Vehicle(long naviId, long operationId, String vehicleIp,  Coordinate position, double velocity_x, double velocity_y, double velocity, double angularVelocity, double acceleration, double angle, int pathId, int naviState, String naviStateName, int confidenceDegree, int radarCollisionAvoidance, int malfunction, long mileage, int contactChargingPile, int relayOn, int hasPackage, int flipState, int jackingDistance, int beltRotationState, int containerState, int salverState,int operationState, String operationStateName, int batteryCapacity, int batteryResidues, int batteryState) {
-		this.naviId = naviId;
-		this.operationId = operationId;
-		this.vehicleIp = vehicleIp;
-		this.position = position;
-		this.velocity_x = velocity_x;
-		this.velocity_y = velocity_y;
-		this.velocity = velocity;
-		this.angularVelocity = angularVelocity;
-		this.acceleration = acceleration;
-		this.angle = angle;
-		this.pathId = pathId;
-		this.naviState = naviState;
-		this.naviStateName = naviStateName;
-		this.confidenceDegree = confidenceDegree;
-		this.radarCollisionAvoidance = radarCollisionAvoidance;
-		this.malfunction = malfunction;
-		this.mileage = mileage;
-		this.contactChargingPile = contactChargingPile;
-		this.relayOn = relayOn;
-		this.hasPackage = hasPackage;
-		this.flipState = flipState;
-		this.jackingDistance = jackingDistance;
-		this.beltRotationState = beltRotationState;
-		this.containerState = containerState;
-		this.salverState = salverState;
-		this.operationState = operationState;
-		this.operationStateName = operationStateName;
-		this.batteryCapacity = batteryCapacity;
-		this.batteryResidues = batteryResidues;
-		this.batteryState = batteryState;
+	public String getVehicleIp() {
+		return vehicleIp;
 	}
-
-	public long getNaviId() {
-		return naviId;
-	}
-
-	public void setNaviId(long naviId) {
-		this.naviId = naviId;
-	}
-
-	public long getOperationId() {
-		return operationId;
-	}
-
-	public void setOperationId(long operationId) {
-		this.operationId = operationId;
-	}
-
 
 	public void setVehicleIp(String vehicleIp) {
 		this.vehicleIp = vehicleIp;
 	}
 
-	public String getVehicleIp() {
-		return vehicleIp;
-	}
-	public  Coordinate getPosition() {
+	public Coordinate getPosition() {
 		return position;
 	}
 
-	public  void setPosition(Coordinate position) {
+	public void setPosition(Coordinate position) {
 		this.position = position;
 	}
 
-	public  double getVelocity_x() {
-		return velocity_x;
+	public double getVx() {
+		return vx;
 	}
 
-	public  void setVelocity_x(double velocity_x) {
-		this.velocity_x = velocity_x;
+	public void setVx(double vx) {
+		this.vx = vx;
 	}
 
-	public  double getVelocity_y() {
-		return velocity_y;
+	public double getVy() {
+		return vy;
 	}
 
-	public  void setVelocity_y(double velocity_y) {
-		this.velocity_y = velocity_y;
+	public void setVy(double vy) {
+		this.vy = vy;
 	}
 
-	public  double getVelocity() {
-		return velocity;
-	}
-
-	public  void setVelocity(double velocity) {
-		this.velocity = velocity;
-	}
-
-	public  double getAcceleration() {
-		return acceleration;
-	}
-
-	public  void setAcceleration(double acceleration) {
-		this.acceleration = acceleration;
-	}
-
-	public  double getAngle() {
-		return angle;
-	}
-
-	public  void setAngle(double angle) {
-		this.angle = angle;
-	}
-
-
-	public  int getPathId() {
-		return pathId;
-	}
-
-	public  void setPathId(int pathId) {
-		this.pathId = pathId;
-	}
-
-	public  int getNaviState() {
-		return naviState;
-	}
-
-	public   void setNaviState(int naviState) {
-		this.naviState = naviState;
-	}
-
-	public int getContainerState() {
-		return containerState;
-	}
-
-	public void setContainerState(int containerState) {
-		this.containerState = containerState;
-	}
-
-	public int getSalverState() {
-		return salverState;
-	}
-
-	public void setSalverState(int salverState) {
-		this.salverState = salverState;
-	}
-
-	public  double getAngularVelocity() {
+	public double getAngularVelocity() {
 		return angularVelocity;
 	}
 
-
-
-	public  void setAngularVelocity(double angularVelocity) {
+	public void setAngularVelocity(double angularVelocity) {
 		this.angularVelocity = angularVelocity;
 	}
 
+	public double getAcceleration() {
+		return acceleration;
+	}
 
+	public void setAcceleration(double acceleration) {
+		this.acceleration = acceleration;
+	}
 
-	public  int getConfidenceDegree() {
+	public double getAngle() {
+		return angle;
+	}
+
+	public void setAngle(double angle) {
+		this.angle = angle;
+	}
+
+	public int getPathId() {
+		return pathId;
+	}
+
+	public void setPathId(int pathId) {
+		this.pathId = pathId;
+	}
+
+	public int getNaviState() {
+		return naviState;
+	}
+
+	public void setNaviState(int naviState) {
+		this.naviState = naviState;
+	}
+
+	public String getNaviStateName() {
+		return naviStateName;
+	}
+
+	public void setNaviStateName(String naviStateName) {
+		this.naviStateName = naviStateName;
+	}
+
+	public int getConfidenceDegree() {
 		return confidenceDegree;
 	}
 
-
-
-	public  void setConfidenceDegree(int confidenceDegree) {
+	public void setConfidenceDegree(int confidenceDegree) {
 		this.confidenceDegree = confidenceDegree;
 	}
 
-
-
-	public  int getRadarCollisionAvoidance() {
-		return radarCollisionAvoidance;
-	}
-
-
-
-	public  void setRadarCollisionAvoidance(int radarCollisionAvoidance) {
-		this.radarCollisionAvoidance = radarCollisionAvoidance;
-	}
-
-
-
-	public  int getMalfunction() {
-		return malfunction;
-	}
-
-
-
-	public  void setMalfunction(int malfunction) {
-		this.malfunction = malfunction;
-	}
-
-
-
-	public  long getMileage() {
+	public long getMileage() {
 		return mileage;
 	}
 
-
-
-	public  void setMileage(long mileage) {
+	public void setMileage(long mileage) {
 		this.mileage = mileage;
 	}
-	public  int getContactChargingPile() {
-		return contactChargingPile;
-	}
-	public  void setContactChargingPile(int contactChargingPile) {
-		this.contactChargingPile = contactChargingPile;
-	}
-	public  int getHasPackage() {
+
+	public int getHasPackage() {
 		return hasPackage;
 	}
-	public  void setHasPackage(int hasPackage) {
+
+	public void setHasPackage(int hasPackage) {
 		this.hasPackage = hasPackage;
 	}
-	public  int getFlipState() {
-		return flipState;
-	}
-	public  void setFlipState(int flipState) {
-		this.flipState = flipState;
-	}
-	public  int getJackingDistance() {
-		return jackingDistance;
-	}
-	public  void setJackingDistance(int jackingDistance) {
-		this.jackingDistance = jackingDistance;
-	}
-	public  int getBeltRotationState() {
+
+	public int getBeltRotationState() {
 		return beltRotationState;
 	}
-	public  void setBeltRotationState(int beltRotationState) {
+
+	public void setBeltRotationState(int beltRotationState) {
 		this.beltRotationState = beltRotationState;
 	}
-	public  int getOperationState() {
+
+	public int getOperationState() {
 		return operationState;
 	}
-	public  void setOperationState(int operationState) {
+
+	public void setOperationState(int operationState) {
 		this.operationState = operationState;
 	}
-	public  int getBatteryCapacity() {
-		return batteryCapacity;
-	}
-	public  void setBatteryCapacity(int batteryCapacity) {
-		this.batteryCapacity = batteryCapacity;
-	}
-	public  int getBatteryResidues() {
-		return batteryResidues;
-	}
-	public  void setBatteryResidues(int batteryResidues) {
-		this.batteryResidues = batteryResidues;
-	}
-	public  int getBatteryState() {
-		return batteryState;
-	}
-	public  void setBatteryState(int batteryState) {
-		this.batteryState = batteryState;
-	}
-	public  int getRelayOn() {
-		return relayOn;
-	}
-	public  void setRelayOn(int relayOn) {
-		this.relayOn = relayOn;
-	}
-	public  String getNaviStateName() {
-		return naviStateName;
-	}
-	public  void setNaviStateName(String naviStateName) {
-		this.naviStateName = naviStateName;
-	}
-	public  String getOperationStateName() {
+
+	public String getOperationStateName() {
 		return operationStateName;
 	}
-	public  void setOperationStateName(String operationStateName) {
+
+	public void setOperationStateName(String operationStateName) {
 		this.operationStateName = operationStateName;
 	}
-	@Override
-	public String toString() {
-		return "Vehicle [vehicleIp=" + vehicleIp + ", transportOrder="  + ", position=" + position
-				+ ", velocity_x=" + velocity_x + ", velocity_y=" + velocity_y + ", velocity=" + velocity
-				+ ", angularVelocity=" + angularVelocity + ", acceleration=" + acceleration + ", angle=" + angle
-				+ ", pathId=" + pathId + ", naviState=" + naviState + ", naviStateName=" + naviStateName
-				+ ", confidenceDegree=" + confidenceDegree + ", radarCollisionAvoidance=" + radarCollisionAvoidance
-				+ ", malfunction=" + malfunction + ", mileage=" + mileage + ", contactChargingPile="
-				+ contactChargingPile + ", relayOn=" + relayOn + ", hasPackage=" + hasPackage + ", flipState="
-				+ flipState + ", jackingDistance=" + jackingDistance + ", beltRotationState=" + beltRotationState
-				+ ", operationState=" + operationState + ", operationStateName=" + operationStateName
-				+ ", batteryCapacity=" + batteryCapacity + ", batteryResidues=" + batteryResidues + ", batteryState="
-				+ batteryState + "]";
+
+	public int getBatteryCapacity() {
+		return batteryCapacity;
 	}
 
-	
-	
-	
+	public void setBatteryCapacity(int batteryCapacity) {
+		this.batteryCapacity = batteryCapacity;
+	}
+
+	public int getBatteryResidues() {
+		return batteryResidues;
+	}
+
+	public void setBatteryResidues(int batteryResidues) {
+		this.batteryResidues = batteryResidues;
+	}
 }

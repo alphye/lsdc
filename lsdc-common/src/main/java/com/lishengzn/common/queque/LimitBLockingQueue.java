@@ -1,4 +1,4 @@
-package com.lishengzn.queque;
+package com.lishengzn.common.queque;
 
 import java.util.*;
 

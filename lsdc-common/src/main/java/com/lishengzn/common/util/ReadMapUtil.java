@@ -1,11 +1,11 @@
-package com.lishengzn.util;
+package com.lishengzn.common.util;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.lishengzn.entity.Coordinate;
-import com.lishengzn.entity.map.Edge;
-import com.lishengzn.entity.map.Node;
-import com.lishengzn.exception.SimpleException;
+import com.lishengzn.common.entity.map.Node;
+import com.lishengzn.lsdc.entity.Coordinate;
+import com.lishengzn.common.entity.map.Edge;
+import com.lishengzn.common.exception.SimpleException;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -81,8 +81,8 @@ public class ReadMapUtil {
 			edge.setStartNodeCoor(startNodeCoor);
 			edge.setEndNodeCoor(endNodeCoor);
 			edgesMap.put(id, edge);
-			/*edgesIDMap.put(startNodeCoor.getPosition_x() + "," + startNodeCoor.getPosition_y() + ","
-					+ endNodeCoor.getPosition_x() + "," + endNodeCoor.getPosition_y(), id);*/
+			/*edgesIDMap.put(startNodeCoor.getX() + "," + startNodeCoor.getY() + ","
+					+ endNodeCoor.getX() + "," + endNodeCoor.getY(), id);*/
 
 		}
 	}
@@ -141,9 +141,9 @@ public class ReadMapUtil {
 	 * @return
 	 */
 	private static Node getNearestNode_left(Coordinate coor) {
-		double x = coor.getPosition_x();
+		double x = coor.getX();
 		x = x - x % cellLength;
-		coor.setPosition_x(x);
+		coor.setX(x);
 		Integer nodeId =nodesIDMap.get(coor);
 		if(nodeId==null){
 			return null;
@@ -160,9 +160,9 @@ public class ReadMapUtil {
 	 * @return
 	 */
 	private static Node getNearestNode_right(Coordinate coor) {
-		double x = coor.getPosition_x();
+		double x = coor.getX();
 		x = x - x % cellLength + cellLength;
-		coor.setPosition_x(x);
+		coor.setX(x);
 		Integer nodeId =nodesIDMap.get(coor);
 		if(nodeId==null){
 			return null;
@@ -179,9 +179,9 @@ public class ReadMapUtil {
 	 * @return
 	 */
 	private static Node getNearestNode_top(Coordinate coor) {
-		double y = coor.getPosition_y();
+		double y = coor.getY();
 		y = y - y % cellLength + cellLength;
-		coor.setPosition_y(y);
+		coor.setY(y);
 		Integer nodeId =nodesIDMap.get(coor);
 		if(nodeId==null){
 			return null;
@@ -197,9 +197,9 @@ public class ReadMapUtil {
 	 * @return
 	 */
 	private static Node getNearestNode_bottom(Coordinate coor) {
-		double y = coor.getPosition_y();
+		double y = coor.getY();
 		y = y - y % cellLength;
-		coor.setPosition_y(y);
+		coor.setY(y);
 		Integer nodeId =nodesIDMap.get(coor);
 		if(nodeId==null){
 			return null;
@@ -266,16 +266,16 @@ public class ReadMapUtil {
 		Coordinate startNodeCoor = null;
 		Coordinate endNodeCoor = null;
 		// 坐标值较小的一个作为start，值大的作为end
-		if (Math.pow(node1.getPosition_x(), 2) + Math.pow(node1.getPosition_y(), 2) < Math.pow(node2.getPosition_x(), 2)
-				+ Math.pow(node2.getPosition_y(), 2)) {
+		if (Math.pow(node1.getX(), 2) + Math.pow(node1.getY(), 2) < Math.pow(node2.getX(), 2)
+				+ Math.pow(node2.getY(), 2)) {
 			startNodeCoor = node1.clone();
 			endNodeCoor = node2.clone();
 		} else {
 			startNodeCoor = node2.clone();
 			endNodeCoor = node1.clone();
 		}
-		/*Integer id = edgesIDMap.get(startNodeCoor.getPosition_x() + "," + startNodeCoor.getPosition_y() + ","
-				+ endNodeCoor.getPosition_x() + "," + endNodeCoor.getPosition_y());*/
+		/*Integer id = edgesIDMap.get(startNodeCoor.getX() + "," + startNodeCoor.getY() + ","
+				+ endNodeCoor.getX() + "," + endNodeCoor.getY());*/
 		Integer id=null;
 		Set<Map.Entry<Integer,Edge>> entrySet=edgesMap.entrySet();
 		for(Map.Entry<Integer,Edge> entry:entrySet){
@@ -293,7 +293,7 @@ public class ReadMapUtil {
 		return id;
 	}
 	private static boolean nodeEquals(Coordinate node1, Coordinate node2){
-		double d =Math.abs(node1.getPosition_x()-node2.getPosition_x())+Math.abs(node1.getPosition_y()-node2.getPosition_y());
+		double d =Math.abs(node1.getX()-node2.getX())+Math.abs(node1.getY()-node2.getY());
 		return d<=10;
 	}
 	public static void generateJSONMap() {

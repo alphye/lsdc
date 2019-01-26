@@ -1,4 +1,4 @@
-package com.lishengzn.lsdc.kernel.util;
+package com.lishengzn.common.util;
 
 
 import java.util.ArrayList;

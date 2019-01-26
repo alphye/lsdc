@@ -1,4 +1,4 @@
-package com.lishengzn.entity;
+package com.lishengzn.lsdc.entity;
 
 public interface DataArea {
 	byte[] toBytes();

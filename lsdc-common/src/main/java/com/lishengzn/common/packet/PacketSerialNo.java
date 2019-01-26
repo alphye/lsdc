@@ -1,9 +1,9 @@
-package com.lishengzn.packet;
+package com.lishengzn.common.packet;
 
 public  class PacketSerialNo {
-	private static  Integer serialNo=1;
+	private static  Short serialNo=0;
 
-	public synchronized static Integer getSerialNo() {
+	public synchronized static Short getNextSerialNo() {
 		return serialNo++;
 	}
 	

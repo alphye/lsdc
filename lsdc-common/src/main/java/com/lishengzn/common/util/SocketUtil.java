@@ -1,15 +1,12 @@
-package com.lishengzn.util;
+package com.lishengzn.common.util;
 
-import com.lishengzn.SocketConstants;
-import com.lishengzn.constants.LSConstants;
-import com.lishengzn.packet.PacketModel;
-import com.lishengzn.packet.PacketSerialNo;
+import com.lishengzn.common.packet.PacketModel;
+import com.lishengzn.common.constants.SocketConstants;
+import com.lishengzn.common.packet.PacketSerialNo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 /** 通讯协议工具类
@@ -25,7 +22,6 @@ import java.util.Arrays;
  **/
 public class SocketUtil {
 
-	private static short packetSerialNo=-1;
 	private static final Logger LOG = LoggerFactory.getLogger(SocketUtil.class);
 
 	/**
@@ -72,19 +68,15 @@ public class SocketUtil {
 	 * @param packetModel
 	 * @throws IOException
 	 */
-	public static void sendPacketData(OutputStream out, PacketModel packetModel) {
+	public static void sendPacketData(OutputStream out, PacketModel packetModel) throws IOException {
 		synchronized (out) {
-			if(packetModel.getSerialNo()<0){
-				packetModel.setSerialNo(getNextSerialNo());
+			if(packetModel.getSerialNo()<=0){
+				packetModel.setSerialNo(PacketSerialNo.getNextSerialNo());
 			}
 			byte[] sendBytes = packetModel.toBytes();
 			BufferedOutputStream bos = new BufferedOutputStream(out);
-			try {
-				bos.write(sendBytes);
-				bos.flush();
-			} catch (IOException e) {
-				LOG.error("发送指令异常！",e);
-			}
+			bos.write(sendBytes);
+			bos.flush();
 		}
 	}
 
@@ -99,9 +91,4 @@ public class SocketUtil {
 		return responsePacketType;
 	}
 
-	public  static short getNextSerialNo(){
-		synchronized(SocketUtil.class){
-			return ++packetSerialNo;
-		}
-	}
 }

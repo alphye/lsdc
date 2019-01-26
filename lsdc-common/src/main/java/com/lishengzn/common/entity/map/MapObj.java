@@ -1,4 +1,4 @@
-package com.lishengzn.entity.map;
+package com.lishengzn.common.entity.map;
 
 public class MapObj {
 	private int id;

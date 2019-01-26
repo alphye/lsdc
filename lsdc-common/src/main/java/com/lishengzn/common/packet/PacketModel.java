@@ -1,9 +1,8 @@
-package com.lishengzn.packet;
+package com.lishengzn.common.packet;
 
 import com.google.common.primitives.Bytes;
-import com.lishengzn.util.ByteUtil;
+import com.lishengzn.common.util.ByteUtil;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.lishengzn.dto;
+package com.lishengzn.lsdc.dto;
 
 import java.io.Serializable;
 import java.util.List;

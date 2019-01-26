@@ -1,4 +1,4 @@
-package com.lishengzn.lsdc.kernel.socket;
+package com.lishengzn.common.socket;
 
 import com.lishengzn.common.communication.AbstractCommunicateAdapter;
 import com.lishengzn.common.communication.service.MessageReceiveService;
@@ -8,7 +8,7 @@ import com.lishengzn.common.exception.SimpleException;
 import com.lishengzn.common.packet.PacketModel;
 import com.lishengzn.common.util.ByteUtil;
 import com.lishengzn.common.util.SocketUtil;
-import com.lishengzn.lsdc.kernel.pool.ObjectPool;
+import com.lishengzn.common.pool.ObjectPool;
 import com.lishengzn.lsdc.entity.Coordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,30 +70,6 @@ public class ClientOfVehicle {
 			e1.printStackTrace();
 		}
 	}
-	/**向服务器发送信息
-	 * @param packetModel 包
-	 * @return
-	 */
-	public void sendMsgToServer(PacketModel packetModel) {
-		OutputStream os = null;
-		try {
-			os = socket.getOutputStream();
-			SocketUtil.sendPacketData(os, packetModel);
-
-		} catch (Exception e) {
-			LOG.error("指令发送异常",e);
-			close();
-		}
-	}
-
-	public void sendTestMsg(short packetType,String msg){
-		short seriaNo=1;
-		PacketModel packetModel = new PacketModel(seriaNo,msg.getBytes().length,packetType,msg);
-		System.out.println(ByteUtil.bytesToHex(packetModel.toBytes()));
-		sendMsgToServer(packetModel);
-	}
-
-
 
 
 	public String getIp() {

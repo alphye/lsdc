@@ -1,10 +1,10 @@
-package com.lishengzn.dto;
+package com.lishengzn.lsdc.dto;
 
 import java.io.Serializable;
 
-import com.lishengzn.entity.Coordinate;
-import com.lishengzn.enums.NaviStateEnum;
-import com.lishengzn.util.Translate;
+import com.lishengzn.lsdc.entity.Coordinate;
+import com.lishengzn.lsdc.enums.NaviStateEnum;
+import com.lishengzn.lsdc.util.Translate;
 
 public class VehicleDto implements Serializable{
 
@@ -54,7 +54,7 @@ public class VehicleDto implements Serializable{
 	/**
 	 * 导航状态
 	 */
-	@Translate(target="naviStateName",cacheKey=NaviStateEnum.class)
+	@Translate(target="naviStateName",cacheKey= NaviStateEnum.class)
 	private int naviState;
 	
 	private String naviStateName;

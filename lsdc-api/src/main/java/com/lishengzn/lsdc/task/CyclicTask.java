@@ -5,9 +5,9 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package com.lishengzn.task;
+package com.lishengzn.lsdc.task;
 
-import com.lishengzn.util.Assertions;
+import com.lishengzn.lsdc.util.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

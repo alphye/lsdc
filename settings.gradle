@@ -1,6 +1,8 @@
-rootProject.name = 'lsdc'
+rootProject.name = 'lsdc-laser'
 include 'lsdc-api'
 include 'lsdc-common'
-include 'lsdc-kernel'
+include 'lsdc-kernel-as'
+include 'lsdc-kernel-navi'
 include 'lsdc-agv'
+include 'lsdc-strategies'
 

@@ -1,4 +1,4 @@
-package com.lishengzn.constants;
+package com.lishengzn.common.constants;
 
 public interface LSConstants {
 	/** 0.包类型转应答包类型时候，加的值 */

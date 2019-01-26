@@ -1,10 +1,10 @@
-package com.lishengzn.socket;
+package com.lishengzn.lsdc.agv.socket;
 
-import com.lishengzn.entity.Coordinate;
-import com.lishengzn.entity.Vehicle;
-import com.lishengzn.enums.NaviStateEnum;
-import com.lishengzn.packet.PacketModel;
-import com.lishengzn.util.SocketUtil;
+import com.lishengzn.lsdc.entity.Coordinate;
+import com.lishengzn.common.entity.Vehicle;
+import com.lishengzn.lsdc.enums.NaviStateEnum;
+import com.lishengzn.common.packet.PacketModel;
+import com.lishengzn.common.util.SocketUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,7 @@ public class Server {
 
 		private static Server getServer() {
 			try {
-				return new Server(2000);
+				return new Server(19204);
 			} catch (IOException e) {
 				e.printStackTrace();
 				return null;
@@ -60,6 +60,9 @@ public class Server {
 		while(true){
 			Socket socket = getSocket();
 			LOG.info("客户端连接：" + socket.getInetAddress().getHostAddress());
+			if(clientHandler!=null){
+				clientHandler.close();
+			}
 			clientHandler = new ClientHandler(socket);
 			threadPool.execute(clientHandler);
 			initializeVehicle();
@@ -89,7 +92,7 @@ class ClientHandler implements Runnable {
 	/**
 	 * 小车接下来要经过的点
 	 */
-	private Queue<Coordinate> vehiclePassingCoorQueue = new LinkedBlockingQueue<Coordinate>(); 
+	private Queue<Coordinate> vehiclePassingCoorQueue = new LinkedBlockingQueue<Coordinate>();
 
 	public ClientHandler(Socket socket) {
 		super();

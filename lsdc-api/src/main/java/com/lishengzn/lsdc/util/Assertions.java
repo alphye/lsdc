@@ -5,7 +5,7 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package com.lishengzn.util;
+package com.lishengzn.lsdc.util;
 
 import javax.annotation.Nullable;
 
