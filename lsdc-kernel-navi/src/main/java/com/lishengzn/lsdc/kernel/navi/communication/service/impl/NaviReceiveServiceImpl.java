@@ -44,7 +44,7 @@ public class NaviReceiveServiceImpl extends AbstractCommunicateAdapter implement
         }catch (IOException e){
             LOG.info("========navi receive end_e");
             if(ObjectPool.getClientOfVehicle(vehicle.getVehicleIp(), ClientOfVehicle.ClientType.statusAPi)!=null){
-                LOG.error("接收小车信息异常，IP：{}",vehicle.getVehicleIp());
+                LOG.error("接收小车信息异常，IP：{}",vehicle.getVehicleIp(),e);
                 ObjectPool.getClientOfVehicle(vehicle.getVehicleIp(), ClientOfVehicle.ClientType.statusAPi).close();
             }
         }

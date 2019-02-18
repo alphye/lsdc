@@ -1,5 +1,6 @@
 package com.lishengzn.lsdc.agv.socket;
 
+import com.alibaba.fastjson.JSONObject;
 import com.lishengzn.lsdc.entity.Coordinate;
 import com.lishengzn.common.entity.Vehicle;
 import com.lishengzn.lsdc.enums.NaviStateEnum;
@@ -56,14 +57,14 @@ public class Server {
 	}
 
 	public void doSocket() throws Exception {
-		ClientHandler clientHandler=null;
+		ClientHandler_navi clientHandler=null;
 		while(true){
 			Socket socket = getSocket();
 			LOG.info("客户端连接：" + socket.getInetAddress().getHostAddress());
 			if(clientHandler!=null){
 				clientHandler.close();
 			}
-			clientHandler = new ClientHandler(socket);
+			clientHandler = new ClientHandler_navi(socket);
 			threadPool.execute(clientHandler);
 			initializeVehicle();
 		}
@@ -82,7 +83,7 @@ public class Server {
 }
 
 class ClientHandler implements Runnable {
-	private static final Logger LOG = LoggerFactory.getLogger(ClientHandler.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ClientHandler_navi.class);
 	private long naviId;
 	private long operationId;
 	private volatile boolean terminate;
@@ -152,7 +153,9 @@ class ClientHandler implements Runnable {
 			while (!isTerminate()) {
 				PacketModel packetModel = null;
 				// 如果能读取取数据包
-				if (!((packetModel = SocketUtil.readNextPacketData(is)) == null)) {}
+				if (!((packetModel = SocketUtil.readNextPacketData(is)) == null)) {
+					LOG.debug("收到客户端信息：{}", JSONObject.toJSONString(packetModel));
+				}
 			}
 
 		} catch (Exception e) {

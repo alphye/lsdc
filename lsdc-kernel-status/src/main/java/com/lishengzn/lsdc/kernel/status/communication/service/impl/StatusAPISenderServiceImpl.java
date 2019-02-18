@@ -28,7 +28,7 @@ public class StatusAPISenderServiceImpl extends AbstractCommunicateAdapter imple
             SocketUtil.sendPacketData(out,packetModel);
         } catch (IOException e) {
             if(ObjectPool.getClientOfVehicle(vehicle.getVehicleIp(), ClientOfVehicle.ClientType.statusAPi)!=null){
-                LOG.error("向小车发送信息异常，IP：{}",vehicle.getVehicleIp());
+                LOG.error("向小车发送信息异常，IP：{}",vehicle.getVehicleIp(),e);
                 ObjectPool.getClientOfVehicle(vehicle.getVehicleIp(), ClientOfVehicle.ClientType.statusAPi).close();
             }
         }
@@ -238,7 +238,7 @@ public class StatusAPISenderServiceImpl extends AbstractCommunicateAdapter imple
     @Override
     public void terminate() {
         super.terminate();
-        if(isInitialized() && retrievalVehicleInfoTask!=null){
+        if(retrievalVehicleInfoTask!=null){
             retrievalVehicleInfoTask.terminate();
         }
 

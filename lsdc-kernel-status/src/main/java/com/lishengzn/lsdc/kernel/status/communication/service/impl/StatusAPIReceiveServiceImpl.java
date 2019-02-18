@@ -10,7 +10,6 @@ import com.lishengzn.common.packet.PacketModel;
 import com.lishengzn.common.util.SocketUtil;
 import com.lishengzn.common.pool.ObjectPool;
 import com.lishengzn.common.socket.ClientOfVehicle;
-import com.lishengzn.lsdc.kernel.status.shortlink.QueryLoadedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,7 +127,7 @@ public class StatusAPIReceiveServiceImpl extends AbstractCommunicateAdapter impl
         }catch (IOException e){
             LOG.info("========apistatus receive end_e");
             if(ObjectPool.getClientOfVehicle(vehicle.getVehicleIp(), ClientOfVehicle.ClientType.statusAPi)!=null){
-                LOG.error("接收小车信息异常，IP：{}",vehicle.getVehicleIp());
+                LOG.error("接收小车信息异常，IP：{}",vehicle.getVehicleIp(),e);
                 ObjectPool.getClientOfVehicle(vehicle.getVehicleIp(), ClientOfVehicle.ClientType.statusAPi).close();
             }
         }
@@ -223,7 +222,6 @@ public class StatusAPIReceiveServiceImpl extends AbstractCommunicateAdapter impl
     private void handleVehicleMap(PacketModel packetModel) {
         ResponseCurrMap mapInfo = JSONObject.parseObject(packetModel.getData(), ResponseCurrMap.class);
         LOG.debug("收到小车地图存储信息：{}",JSONObject.toJSONString(mapInfo));
-        QueryLoadedMap.currLoadedMap=mapInfo.getCurrent_map();
     }
 
     private void handleVehicleSlam(PacketModel packetModel) {

@@ -23,11 +23,11 @@ public class ShortLinkClient {
         this.clientType = clientType;
         this.vehicle = vehicle;
     }
-    public void runShortLink(Consumer<Socket> send, Consumer<Socket> receive){
+    public void runShortLinkClient(Consumer<Socket> sender, Consumer<Socket> receiver){
         try {
             this.socket = new Socket(ip,port);
-            send.accept(socket);
-            receive.accept(socket);
+            sender.accept(socket);
+            receiver.accept(socket);
         } catch (IOException e) {
             throw new SimpleException("无法连接到车辆，请确认车辆已开启！");
         }finally {

@@ -77,6 +77,7 @@ public abstract class CyclicTask
    * interrupted, but it will not be run again after finishing.
    */
   public void terminate() {
+    LOG.debug("CyclicTask terminate");
     synchronized (syncObject) {
       if (isTerminated()) {
         LOG.warn("Already terminated");

@@ -12,6 +12,17 @@
 	http://www.springframework.org/schema/util
     http://www.springframework.org/schema/util/spring-util-3.0.xsd">
     
-	<context:property-placeholder location="classpath*:/config/*.properties" />
-	<import resource="classpath:spring/spring-datasource.xml"/>
+	<!--<context:property-placeholder location="classpath*:/config/*.properties" />-->
+
+	<bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:config/*.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<import resource="classpath:spring/spring-mvc.xml"/>
+	<import resource="classpath:spring/dubbo-config.xml"/>
+	<import resource="classpath:spring/kernel-navi-provider.xml"/>
 </beans>

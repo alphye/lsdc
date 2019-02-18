@@ -5,4 +5,6 @@ include 'lsdc-kernel-status'
 include 'lsdc-kernel-navi'
 include 'lsdc-agv'
 include 'lsdc-strategies'
+include 'lsdc-kernel-service'
+include 'lsdc-web'
 

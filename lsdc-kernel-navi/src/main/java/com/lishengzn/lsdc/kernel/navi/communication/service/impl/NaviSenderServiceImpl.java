@@ -29,7 +29,7 @@ public class NaviSenderServiceImpl extends AbstractCommunicateAdapter implements
             SocketUtil.sendPacketData(out,packetModel);
         } catch (IOException e) {
             if(ObjectPool.getClientOfVehicle(vehicle.getVehicleIp(), ClientOfVehicle.ClientType.vehicleNavi)!=null){
-                LOG.error("向小车发送信息异常，IP：{}",vehicle.getVehicleIp());
+                LOG.error("向小车发送信息异常，IP：{}",vehicle.getVehicleIp(),e);
                 ObjectPool.getClientOfVehicle(vehicle.getVehicleIp(), ClientOfVehicle.ClientType.vehicleNavi).close();
             }
         }
@@ -230,7 +230,7 @@ public class NaviSenderServiceImpl extends AbstractCommunicateAdapter implements
     @Override
     public void terminate() {
         super.terminate();
-        if(isInitialized() && retrievalVehicleInfoTask!=null){
+        if(retrievalVehicleInfoTask!=null){
             retrievalVehicleInfoTask.terminate();
         }
 
