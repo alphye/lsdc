@@ -9,8 +9,7 @@ import java.net.Socket;
 public abstract class AbstractCommunicateAdapter implements Lifecycle {
     private Socket socket;
     protected Vehicle vehicle;
-    private boolean initialized;
-    private volatile boolean terminate;
+    private volatile boolean initialized;
 
     public Vehicle getVehicle() {
         return vehicle;
@@ -20,7 +19,6 @@ public abstract class AbstractCommunicateAdapter implements Lifecycle {
         this.vehicle = vehicle;
     }
 
-    public abstract void runTask();
     @Override
     public boolean isInitialized() {
         return initialized;
@@ -29,29 +27,15 @@ public abstract class AbstractCommunicateAdapter implements Lifecycle {
     @Override
     public void initialize() {
         if(!isInitialized()){
-            this.setInitialized(true);
-            this.setTerminate(false);
+            this.initialized=true;
         }
     }
 
     @Override
     public void terminate() {
         if(isInitialized()){
-            this.setInitialized(false);
-            this.setTerminate(true);
+            this.initialized=false;
         }
-    }
-
-    public void setInitialized(boolean initialized) {
-        this.initialized = initialized;
-    }
-
-    public boolean isTerminate() {
-        return terminate;
-    }
-
-    public void setTerminate(boolean terminate) {
-        this.terminate = terminate;
     }
 
     public Socket getSocket() {

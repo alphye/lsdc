@@ -4,54 +4,54 @@ import com.lishengzn.lsdc.entity.Coordinate;
 
 public class Edge extends MapObj{
 
-	private Integer startNodeId;
-	private Integer endNodeId;
-	private Coordinate startNodeCoor;
-	private Coordinate endNodeCoor;
-	public Edge(int id, Integer startNodeId, Integer endNodeId) {
+	private String startNodeId;
+	private String endNodeId;
+	private Coordinate startPos;
+	private Coordinate endPos;
+	public Edge(String id, String startNodeId, String endNodeId) {
 		super(id);
 		this.startNodeId = startNodeId;
 		this.endNodeId = endNodeId;
 	}
 	
 	
-	public Integer getStartNodeId() {
+	public String getStartNodeId() {
 		return startNodeId;
 	}
-	public void setStartNodeId(Integer startNodeId) {
+	public void setStartNodeId(String startNodeId) {
 		this.startNodeId = startNodeId;
 	}
-	public Integer getEndNodeId() {
+	public String getEndNodeId() {
 		return endNodeId;
 	}
-	public void setEndNodeId(Integer endNodeId) {
+	public void setEndNodeId(String endNodeId) {
 		this.endNodeId = endNodeId;
 	}
 
-
-	public Coordinate getStartNodeCoor() {
-		return startNodeCoor;
+	public Coordinate getStartPos() {
+		return startPos;
 	}
 
-
-	public void setStartNodeCoor(Coordinate startNodeCoor) {
-		this.startNodeCoor = startNodeCoor;
+	public void setStartPos(Coordinate startPos) {
+		this.startPos = startPos;
 	}
 
-
-	public Coordinate getEndNodeCoor() {
-		return endNodeCoor;
+	public Coordinate getEndPos() {
+		return endPos;
 	}
 
-
-	public void setEndNodeCoor(Coordinate endNodeCoor) {
-		this.endNodeCoor = endNodeCoor;
+	public void setEndPos(Coordinate endPos) {
+		this.endPos = endPos;
 	}
 
 	public Edge clone(){
 		Edge newEdge =new Edge(getId(),startNodeId,endNodeId);
-		newEdge.startNodeCoor=startNodeCoor.clone();
-		newEdge.endNodeCoor=endNodeCoor.clone();
+		if(startPos!=null){
+			newEdge.startPos=startPos.clone();
+		}
+		if(endPos!=null){
+			newEdge.endPos=endPos.clone();
+		}
 		return newEdge;
 	}
 

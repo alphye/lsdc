@@ -27,5 +27,5 @@
 	<import resource="classpath:spring/dubbo-config.xml"/>
 	<import resource="classpath:spring/kernel-service-provider.xml"/>
 	<import resource="classpath:spring/kernel-status-consumer.xml"/>
-	<import resource="classpath:spring/kernel-navi-consumer.xml"/>
+	<import resource="classpath:spring/kernel-strategies-consumer.xml"/>
 </beans>

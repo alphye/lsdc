@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo" xsi:schemaLocation="http://www.springframework.org/schema/beans
+	       http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	       http://code.alibabatech.com/schema/dubbo
+           http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+    <dubbo:service interface="com.lishengzn.common.service.VehicleControlService" ref="vehicleOnOffService"/>
+    <bean id="vehicleOnOffService" class="com.lishengzn.lsdc.communication.vehicle.service.impl.VehicleControlServiceImpl"/>
+
+    <dubbo:service interface="com.lishengzn.common.service.VehiclePoolService" ref="vehiclePoolService"/>
+    <bean id="vehiclePoolService" class="com.lishengzn.lsdc.communication.vehicle.service.impl.VehiclePoolServiceImpl"/>
+</beans>

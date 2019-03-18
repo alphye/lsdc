@@ -112,7 +112,7 @@ public class SocketUtil {
 	 * @return
 	 */
 	public static short getResponsePacketType(short packetType) {
-		short responsePacketType = (short)(packetType | SocketConstants.RESPONSE_PACKET_ADDED);
+		short responsePacketType = (short)(packetType +SocketConstants.RESPONSE_PACKET_ADDED);
 		return responsePacketType;
 	}
 

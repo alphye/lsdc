@@ -6,7 +6,7 @@ public class Node extends MapObj{
 
 	private Coordinate position;
 
-	public Node(int id, Coordinate position) {
+	public Node(String id, Coordinate position) {
 		super(id);
 		this.position = position;
 	}

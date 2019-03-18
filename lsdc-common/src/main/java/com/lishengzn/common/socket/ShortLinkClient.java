@@ -1,6 +1,5 @@
 package com.lishengzn.common.socket;
 
-import com.lishengzn.common.entity.Vehicle;
 import com.lishengzn.common.exception.SimpleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,13 +14,11 @@ public class ShortLinkClient {
     private String ip;
     private int port;
     private ClientOfVehicle.ClientType clientType;
-    private Vehicle vehicle;
 
-    public ShortLinkClient(String ip, int port, ClientOfVehicle.ClientType clientType, Vehicle vehicle) {
+    public ShortLinkClient(String ip, int port, ClientOfVehicle.ClientType clientType) {
         this.ip = ip;
         this.port = port;
         this.clientType = clientType;
-        this.vehicle = vehicle;
     }
     public void runShortLinkClient(Consumer<Socket> sender, Consumer<Socket> receiver){
         try {

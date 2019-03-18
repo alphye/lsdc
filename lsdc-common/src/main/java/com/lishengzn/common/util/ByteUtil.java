@@ -107,7 +107,7 @@ public class ByteUtil {
      */
     public static byte[] short2Bytes(short x) {
         ByteBuffer buffer = ByteBuffer.allocate(2);
-        ByteOrder bo = ByteOrder.BIG_ENDIAN;
+        ByteOrder bo = ByteOrder.LITTLE_ENDIAN;
         buffer.order(bo);
         buffer.putShort(x);
         return buffer.array();

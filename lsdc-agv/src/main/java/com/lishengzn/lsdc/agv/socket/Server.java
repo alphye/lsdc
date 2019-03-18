@@ -1,6 +1,7 @@
 package com.lishengzn.lsdc.agv.socket;
 
 import com.alibaba.fastjson.JSONObject;
+import com.lishengzn.common.constants.SocketConstants;
 import com.lishengzn.lsdc.entity.Coordinate;
 import com.lishengzn.common.entity.Vehicle;
 import com.lishengzn.lsdc.enums.NaviStateEnum;
@@ -57,14 +58,14 @@ public class Server {
 	}
 
 	public void doSocket() throws Exception {
-		ClientHandler_navi clientHandler=null;
+		ClientHandler clientHandler=null;
 		while(true){
 			Socket socket = getSocket();
 			LOG.info("客户端连接：" + socket.getInetAddress().getHostAddress());
 			if(clientHandler!=null){
 				clientHandler.close();
 			}
-			clientHandler = new ClientHandler_navi(socket);
+			clientHandler = new ClientHandler(socket);
 			threadPool.execute(clientHandler);
 			initializeVehicle();
 		}
@@ -148,13 +149,30 @@ class ClientHandler implements Runnable {
 	
 	private void listen2Server(Socket socket) {
 		InputStream is = null;
+		OutputStream out =null;
 		try {
 			is = socket.getInputStream();
+			out = socket.getOutputStream();
+			double x=1;
+			double y=10;
 			while (!isTerminate()) {
 				PacketModel packetModel = null;
 				// 如果能读取取数据包
 				if (!((packetModel = SocketUtil.readNextPacketData(is)) == null)) {
 					LOG.debug("收到客户端信息：{}", JSONObject.toJSONString(packetModel));
+					if(packetModel.getPacketType()== SocketConstants.PACKET_TYPE_STATUS_API_ALL2){
+						packetModel.setPacketType((short)(SocketConstants.RESPONSE_PACKET_ADDED+packetModel.getPacketType()));
+						String packetData="{\"angle\": -0.0064,\"confidence\": 0.637,\"x\": "+x+++",\"y\": "+y+++",\"current_station\": \"LM1\"}";
+						packetModel.setDataLength(packetData.getBytes().length);
+						packetModel.setData(packetData);
+						SocketUtil.sendPacketData(out,packetModel);
+					}
+					else if(packetModel.getPacketType()== SocketConstants.PACKET_TYPE_STATUS_API_BLOCK){
+						packetModel.setPacketType((short)(SocketConstants.RESPONSE_PACKET_ADDED+packetModel.getPacketType()));
+						packetModel.setData("{\"block_reason\": 3,\"block_x\": 0.637,\"block_y\": 3.5069,\"block_ultrasonic_id\": 0}");
+						packetModel.setDataLength(packetModel.getData().getBytes().length);
+						SocketUtil.sendPacketData(out,packetModel);
+					}
 				}
 			}
 

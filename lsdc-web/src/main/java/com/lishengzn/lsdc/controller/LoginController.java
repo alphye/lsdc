@@ -1,6 +1,5 @@
 package com.lishengzn.lsdc.controller;
 
-import com.lishengzn.lsdc.websocket.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -24,7 +23,7 @@ public class LoginController {
     public String login(HttpServletRequest request){
         HttpSession session = request.getSession(true);
         String accountID = "actid_"+ UUID.randomUUID();
-        session.setAttribute(Constants.SKEY_ACCOUNT_ID, accountID);
+//        session.setAttribute(Constants.SKEY_ACCOUNT_ID, accountID);
         return "/main.jsp";
     }
 }

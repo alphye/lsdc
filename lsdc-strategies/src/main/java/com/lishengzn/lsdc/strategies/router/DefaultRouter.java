@@ -2,7 +2,6 @@ package com.lishengzn.lsdc.strategies.router;
 
 import com.lishengzn.lsdc.entity.Coordinate;
 import com.lishengzn.common.entity.map.Edge;
-import com.lishengzn.common.util.ReadMapUtil;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
@@ -18,19 +17,16 @@ import java.util.stream.Collectors;
 
 public class DefaultRouter {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultRouter.class);
-    private static Graph<Integer,ModelEdge> graph =new DirectedWeightedMultigraph<Integer,ModelEdge>(ModelEdge.class);
-    private static ShortestPathAlgorithm<Integer,ModelEdge> algo;
+    private static Graph<String,ModelEdge> graph = new DirectedWeightedMultigraph<>(ModelEdge.class);
+    private static ShortestPathAlgorithm<String,ModelEdge> algo;
 
-    static{
-        initializeGraph();
-    }
 
-    private static void initializeGraph() {
-        Set<Integer> nodes = ReadMapUtil.getNodeIds();
+    public static void initializeRouter() {
+        Set<String> nodes = ReadMapUtil.getNodeIds();
         nodes.forEach((nodeId)->{
             graph.addVertex(nodeId);
         });
-        Set<Integer> edgeIds =ReadMapUtil.getEdgeIds();
+        Set<String> edgeIds =ReadMapUtil.getEdgeIds();
         edgeIds.forEach((edgeId)->{
             Edge edge = ReadMapUtil.getEdgeById(edgeId);
             // 沿边的起点到终点
@@ -40,20 +36,25 @@ public class DefaultRouter {
             }
             graph.setEdgeWeight(e1, 1);
 
-            // 沿边的终点到起点
+           /* // 沿边的终点到起点
             ModelEdge e2 = new ModelEdge(edge,false);
             if(!graph.addEdge(edge.getEndNodeId(),edge.getStartNodeId(), e2)){
                 throw new RuntimeException("initializeGraph error edgeId: "+edgeId);
             }
-            graph.setEdgeWeight(e2, 1);
+            graph.setEdgeWeight(e2, 1);*/
         });
-        algo = new DijkstraShortestPath<Integer,ModelEdge>(graph);
+        algo = new DijkstraShortestPath<>(graph);
     }
 
-    public static List<Integer> getRoute(Integer startNodeId, Integer endNodeId){
-        GraphPath<Integer, ModelEdge> graphPath =algo.getPath(startNodeId, endNodeId);
+    /**
+     * @param startNodeId 起始点
+     * @param endNodeId 终点
+     * @return 路径所经过的点的ID
+     */
+    public static List<String> getRoute(String startNodeId, String endNodeId){
+        GraphPath<String, ModelEdge> graphPath =algo.getPath(startNodeId, endNodeId);
         List<ModelEdge> weightedEdges =graphPath.getEdgeList();
-        List<Integer> nodeIds = weightedEdges.stream().map((weightedEdge)->{
+        List<String> nodeIds = weightedEdges.stream().map((weightedEdge)->{
             return weightedEdge.isMoveToEnd() ? weightedEdge.getEdge().getStartNodeId() : weightedEdge.getEdge().getEndNodeId();
         }).collect(Collectors.toList());
         ModelEdge lastModelEdge = (weightedEdges.get(weightedEdges.size()-1));
@@ -61,21 +62,26 @@ public class DefaultRouter {
         return nodeIds;
     }
 
-    public static List<Coordinate> getRoute2(Integer startNodeId, Integer endNodeId){
-        GraphPath<Integer, ModelEdge> graphPath =algo.getPath(startNodeId, endNodeId);
+    /**
+     * @param startNodeId 起始点
+     * @param endNodeId 终点
+     * @return 路径所经过的点的坐标
+     */
+    public static List<Coordinate> getRoute2(String startNodeId, String endNodeId){
+        GraphPath<String, ModelEdge> graphPath =algo.getPath(startNodeId, endNodeId);
         List<ModelEdge> weightedEdges =graphPath.getEdgeList();
-        List<Coordinate> nodeIds = weightedEdges.stream().map((weightedEdge)->{
-            return weightedEdge.isMoveToEnd() ? weightedEdge.getEdge().getStartNodeCoor() : weightedEdge.getEdge().getEndNodeCoor();
+        List<Coordinate> nodes = weightedEdges.stream().map((weightedEdge)->{
+            return weightedEdge.isMoveToEnd() ? weightedEdge.getEdge().getStartPos() : weightedEdge.getEdge().getEndPos();
         }).collect(Collectors.toList());
         ModelEdge lastModelEdge = (weightedEdges.get(weightedEdges.size()-1));
-        nodeIds.add(lastModelEdge.isMoveToEnd() ? lastModelEdge.getEdge().getEndNodeCoor() : lastModelEdge.getEdge().getStartNodeCoor());
-        return nodeIds;
+        nodes.add(lastModelEdge.isMoveToEnd() ? lastModelEdge.getEdge().getEndPos() : lastModelEdge.getEdge().getStartPos());
+        return nodes;
     }
 
     public static void main(String[] args){
-        int startId =10001009;
-        int endId =10001005;
-        List<Integer> steps = getRoute(startId,endId);
+        String startId ="10001009";
+        String endId ="10001005";
+        List<String> steps = getRoute(startId,endId);
         List<Coordinate> steps2 = getRoute2(startId,endId);
         System.out.println(Arrays.toString(steps.toArray(new Integer[]{})));
         System.out.println(Arrays.toString(steps2.toArray(new Coordinate[]{})));

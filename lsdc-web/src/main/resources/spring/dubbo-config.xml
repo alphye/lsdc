@@ -8,7 +8,7 @@
     <dubbo:application name="lsdc-web"  organization="lszn" />
 
     <dubbo:protocol name="dubbo" port="${lsdc.dubbo.port_web}" />
-
-    <dubbo:registry protocol="zookeeper" address="${lsdc.dubbo.zookeeper_address}" client="zkclient" register="false" />
+    <dubbo:consumer check="false" timeout="${lsdc.dubbo.timeout}"/>
+    <!--<dubbo:registry protocol="zookeeper" address="${lsdc.dubbo.zookeeper_address}" client="zkclient" register="false" check="false"/>-->
 
 </beans>

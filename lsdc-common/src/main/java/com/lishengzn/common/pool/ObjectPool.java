@@ -1,16 +1,11 @@
 package com.lishengzn.common.pool;
 
-import com.lishengzn.common.entity.Vehicle;
 import com.lishengzn.common.socket.ClientOfVehicle;
-import org.apache.commons.lang3.StringUtils;
 
-import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -21,8 +16,10 @@ public class ObjectPool {
     /** 向小车发送信息的线程池*/
     public static final ExecutorService messageSendThreadPool = Executors.newCachedThreadPool();
 
-    /** 连接小车的客户端池*/
-    private static final Map<String, ClientOfVehicle> CLIENTOFVEHICLEPOOL = new ConcurrentHashMap<>();
+    /** 连接小车的客户端池 status 端口*/
+    private static final Map<String, ClientOfVehicle> CLIENTOFVEHICLEPOOL_STATUS = new ConcurrentHashMap<>();
+    /** 连接小车的客户端池 navi 端口*/
+    private static final Map<String, ClientOfVehicle> CLIENTOFVEHICLEPOOL_NAVI = new ConcurrentHashMap<>();
 
 
     /**向客户端池新增加一个元素
@@ -35,7 +32,10 @@ public class ObjectPool {
         requireNonNull(client);
         requireNonNull(clientType);
         if(clientType.equals(ClientOfVehicle.ClientType.statusAPi)){
-            CLIENTOFVEHICLEPOOL.put(key,client);
+            CLIENTOFVEHICLEPOOL_STATUS.put(key,client);
+        }
+        else if(clientType.equals(ClientOfVehicle.ClientType.vehicleNavi)){
+            CLIENTOFVEHICLEPOOL_NAVI.put(key,client);
         }
     }
     /**从客户端池删除一个元素
@@ -46,7 +46,10 @@ public class ObjectPool {
         requireNonNull(key);
         requireNonNull(clientType);
         if(clientType.equals(ClientOfVehicle.ClientType.statusAPi)){
-           return CLIENTOFVEHICLEPOOL.remove(key);
+           return CLIENTOFVEHICLEPOOL_STATUS.remove(key);
+        }
+        else if(clientType.equals(ClientOfVehicle.ClientType.vehicleNavi)){
+            return CLIENTOFVEHICLEPOOL_NAVI.remove(key);
         }
         return null;
     }
@@ -59,7 +62,10 @@ public class ObjectPool {
         requireNonNull(key);
         requireNonNull(clientType);
         if(clientType.equals(ClientOfVehicle.ClientType.statusAPi)){
-            return CLIENTOFVEHICLEPOOL.get(key);
+            return CLIENTOFVEHICLEPOOL_STATUS.get(key);
+        }
+        else if(clientType.equals(ClientOfVehicle.ClientType.vehicleNavi)){
+            return CLIENTOFVEHICLEPOOL_NAVI.get(key);
         }
         return null;
     }

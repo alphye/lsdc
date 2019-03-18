@@ -12,12 +12,16 @@ public class Vehicle implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 
+	/** 锁对象的整合类，只提供getter */
+	private RequestSyncObjCollection requestSnynObj = new RequestSyncObjCollection();
+
 	private String vehicleIp;
 	/**
 	 * 车辆位置
 	 */
 	private Coordinate position;
-	
+	/** 机器人当前所在站点的 ID（该判断比较严格，机器人必须很靠近某一个站点(<30cm)，否则为空字符，即不处于任何站点）; */
+	private String currentStation;
 	/**
 	 * x方向速度
 	 */
@@ -56,12 +60,12 @@ public class Vehicle implements Serializable{
 	/**
 	 * 置信度
 	 */
-	private int confidenceDegree;
+	private double confidenceDegree;
 	
 		/**
 	 * 总里程数
 	 */
-	private long mileage;
+	private double mileage;
 	
 	/**
 	 * 小车是否有包裹
@@ -96,6 +100,31 @@ public class Vehicle implements Serializable{
 		this.position=position;
 	}
 
+	public Vehicle(String vehicleIp, Coordinate position, double vx, double vy, double angularVelocity, double acceleration, double angle, int pathId, int naviState, String naviStateName, double confidenceDegree, double mileage, int hasPackage, int beltRotationState, int operationState, String operationStateName, int batteryCapacity, int batteryResidues) {
+		this.vehicleIp = vehicleIp;
+		this.position = position;
+		this.vx = vx;
+		this.vy = vy;
+		this.angularVelocity = angularVelocity;
+		this.acceleration = acceleration;
+		this.angle = angle;
+		this.pathId = pathId;
+		this.naviState = naviState;
+		this.naviStateName = naviStateName;
+		this.confidenceDegree = confidenceDegree;
+		this.mileage = mileage;
+		this.hasPackage = hasPackage;
+		this.beltRotationState = beltRotationState;
+		this.operationState = operationState;
+		this.operationStateName = operationStateName;
+		this.batteryCapacity = batteryCapacity;
+		this.batteryResidues = batteryResidues;
+	}
+
+	public RequestSyncObjCollection getRequestSnynObj() {
+		return requestSnynObj;
+	}
+
 	public String getVehicleIp() {
 		return vehicleIp;
 	}
@@ -110,6 +139,14 @@ public class Vehicle implements Serializable{
 
 	public void setPosition(Coordinate position) {
 		this.position = position;
+	}
+
+	public String getCurrentStation() {
+		return currentStation;
+	}
+
+	public void setCurrentStation(String currentStation) {
+		this.currentStation = currentStation;
 	}
 
 	public double getVx() {
@@ -176,19 +213,19 @@ public class Vehicle implements Serializable{
 		this.naviStateName = naviStateName;
 	}
 
-	public int getConfidenceDegree() {
+	public double getConfidenceDegree() {
 		return confidenceDegree;
 	}
 
-	public void setConfidenceDegree(int confidenceDegree) {
+	public void setConfidenceDegree(double confidenceDegree) {
 		this.confidenceDegree = confidenceDegree;
 	}
 
-	public long getMileage() {
+	public double getMileage() {
 		return mileage;
 	}
 
-	public void setMileage(long mileage) {
+	public void setMileage(double mileage) {
 		this.mileage = mileage;
 	}
 
@@ -238,5 +275,10 @@ public class Vehicle implements Serializable{
 
 	public void setBatteryResidues(int batteryResidues) {
 		this.batteryResidues = batteryResidues;
+	}
+
+	@Override
+	public Vehicle clone()  {
+		return new Vehicle(vehicleIp, position, vx, vy, angularVelocity, acceleration, angle, pathId, naviState, naviStateName, confidenceDegree, mileage, hasPackage, beltRotationState, operationState, operationStateName, batteryCapacity, batteryResidues);
 	}
 }

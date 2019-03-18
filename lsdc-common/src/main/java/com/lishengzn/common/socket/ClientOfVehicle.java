@@ -51,10 +51,7 @@ public class ClientOfVehicle {
 		messageReceiveService.setSocket(socket);
 		try {
 			messageSenderService.initialize();
-			messageSenderService.runTask();
-
 			messageReceiveService.initialize();
-			messageReceiveService.runTask();
 			LOG.info("connect to " + ip + ":" + port + "  successful");
 		}catch (Exception e){
 			e.printStackTrace();
@@ -62,7 +59,7 @@ public class ClientOfVehicle {
 	}
 
 	public void close(){
-		LOG.info("与车辆连接关闭,IP：{},clientType:{}",ip,clientType);
+		LOG.info("与车辆连接关闭,IP：{},port：{},clientType:{}",ip,port,clientType);
 		try {
 			if(socket!=null){
 				socket.close();
@@ -94,6 +91,10 @@ public class ClientOfVehicle {
 
 	public MessageReceiveService getMessageReceiveService() {
 		return (MessageReceiveService) messageReceiveService;
+	}
+
+	public ClientType getClientType() {
+		return clientType;
 	}
 
 	@Override
